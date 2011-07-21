@@ -1,5 +1,5 @@
 import unittest
-from nmea import NMEASentence, GPGLL
+from pynmea.nmea import NMEASentence, GPGLL
 
 class TestNMEAParse(unittest.TestCase):
     def setUp(self):

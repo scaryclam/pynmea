@@ -64,7 +64,12 @@ class GPGLL(NMEASentence):
     @property
     def lat_direction(self):
         mapping = {'N': 'North', 'S': 'South'}
-        return mapping[self.lat.upper()]
+        return mapping[self.lat_dir.upper()]
+
+    @property
+    def lon_direction(self):
+        mapping = {"E": "East", "W": "West"}
+        return mapping[self.lon_dir.upper()]
 
 
 #class GPAAM(NMEASentence):
