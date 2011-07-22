@@ -72,6 +72,75 @@ class GPGLL(NMEASentence):
         return mapping[self.lon_dir.upper()]
 
 
+class GPBOD(NMEASentence):
+    def __init__(self):
+        # 045.,T,023.,M,DEST,START
+        parse_map = (('Bearing True', 'bearing_t'),
+                     ('Bearing True Type', 'bearing_t_type'),
+                     ('Bearing Magnetic', 'bearing_mag'),
+                     ('Bearing Magnetic Type', 'bearing_mag_type'),
+                     ('Destination', 'dest'),
+                     ('Start', 'start'))
+
+        super(GPBOD, self).__init__(parse_map)
+
+    @property
+    def bearing_true(self):
+        return ','.join([self.bearing_t, self.bearing_t_type])
+
+    @property
+    def bearing_magnetic(self):
+        return ','.join([self.bearing_mag, self.bearing_mag_type])
+
+    @property
+    def destination(self):
+        return self.dest
+
+    @property
+    def origin(self):
+        return self.start
+
+
+class GPBWC(NMEASentence):
+    def __init__(self):
+        parse_map = (
+            ('Timestamp', 'timestamp'),
+            ('Latitude of next Waypoint', 'lat_next'),
+            ('Latitude of next Waypoint Direction', 'lat_next_direction'),
+            ('Longitude of next Waypoint', 'lon_next'),
+            ('Longitude of next Waypoint Direction', 'lon_next_direction'),
+            ('True track to waypoint', 'true_track'),
+            ('True Track Symbol', 'true_track_sym'),
+            ('Magnetic track to waypoint', 'mag_track'),
+            ('Magnetic Symbol', 'mag_sym'),
+            ('Range to waypoint', 'range_next'),
+            ('Unit of range', 'range_unit'),
+            ('Waypoint Name', 'waypoint_name'),
+            ('Checksum', 'checksum'))
+
+        super(GPBWC, self).__init__(parse_map)
+
+
+class GPBWR(NMEASentence):
+    def __init__(self):
+        parse_map = (
+            ('Timestamp', 'timestamp'),
+            ('Latitude of next Waypoint', 'lat_next'),
+            ('Latitude of next Waypoint Direction', 'lat_next_direction'),
+            ('Longitude of next Waypoint', 'lon_next'),
+            ('Longitude of next Waypoint Direction', 'lon_next_direction'),
+            ('True track to waypoint', 'true_track'),
+            ('True Track Symbol', 'true_track_sym'),
+            ('Magnetic track to waypoint', 'mag_track'),
+            ('Magnetic Symbol', 'mag_sym'),
+            ('Range to waypoint', 'range_next'),
+            ('Unit of range', 'range_unit'),
+            ('Waypoint Name', 'waypoint_name'),
+            ('Checksum', 'checksum'))
+
+        super(GPBWR, self).__init__(parse_map)
+
+
 #class GPAAM(NMEASentence):
     #def __init__(self):
         #super(GPAAM).__init__()
@@ -98,9 +167,9 @@ class GPGLL(NMEASentence):
 
 
     #* $GPBEC - Bearing & Distance to Waypoint, Dead Reckoning
-    #* $GPBOD - Bearing, Origin to Destination
-    #* $GPBWC - Bearing & Distance to Waypoint, Great Circle
-    #* $GPBWR - Bearing & Distance to Waypoint, Rhumb Line
+
+
+
     #* $GPBWW - Bearing, Waypoint to Waypoint
     #* $GPDBT - Depth Below Transducer
     #* $GPDCN - Decca Position
@@ -108,7 +177,6 @@ class GPGLL(NMEASentence):
     #* $GPFSI - Frequency Set Information
     #* $GPGGA - Global Positioning System Fix Data
     #* $GPGLC - Geographic Position, Loran-C
-    ####* $GPGLL - Geographic Position, Latitude/Longitude
     #* $GPGSA - GPS DOP and Active Satellites
     #* $GPGSV - GPS Satellites in View
     #* $GPGXA - TRANSIT Position
