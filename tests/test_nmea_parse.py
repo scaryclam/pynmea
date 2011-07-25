@@ -102,6 +102,13 @@ class TestGPGLL(unittest.TestCase):
         self.assertEquals(p.lon_direction, 'East')
         self.assertEquals(p.checksum, "77")
 
+    def test_checksum_passes(self):
+        p = GPGLL()
+        p.parse("$GPGLL,3751.65,S,14507.36,E*77")
+        result = p.check_chksum()
+
+        self.assertTrue(result)
+
 
 class TestGPBOD(unittest.TestCase):
     def setUp(self):
@@ -143,7 +150,7 @@ class TestGPBWC(unittest.TestCase):
 
     def test_parses_map(self):
         p = GPBWC()
-        p.parse("$GPBWC,220516,5130.02,N,00046.34,W,213.8,T,218.0,M,0004.6,N,EGLM*11")
+        p.parse("$GPBWC,220516,5130.02,N,00046.34,W,213.8,T,218.0,M,0004.6,N,EGLM*21")
 
         self.assertEquals("GPBWC", p.sen_type)
         self.assertEquals("220516", p.timestamp)
@@ -158,7 +165,14 @@ class TestGPBWC(unittest.TestCase):
         self.assertEquals("0004.6", p.range_next)
         self.assertEquals("N", p.range_unit)
         self.assertEquals("EGLM", p.waypoint_name)
-        self.assertEquals("11", p.checksum)
+        self.assertEquals("21", p.checksum)
+
+    def test_checksum_passes(self):
+        p = GPBWC()
+        p.parse("$GPBWC,220516,5130.02,N,00046.34,W,213.8,T,218.0,M,0004.6,N,EGLM*21")
+
+        result = p.check_chksum()
+        self.assertTrue(result)
 
 
 class TestGPBWR(unittest.TestCase):
