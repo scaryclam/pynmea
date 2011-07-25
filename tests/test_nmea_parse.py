@@ -42,6 +42,35 @@ class TestNMEAParse(unittest.TestCase):
         self.assertEquals(p.lon_dir, 'E')
         self.assertEquals(p.checksum, '77')
 
+    def test_checksum_passes(self):
+        parse_map = ('Checksum', 'checksum')
+        nmea_str = "$GPGLL,3751.65,S,14507.36,E*77"
+        p = NMEASentence(parse_map)
+        p.checksum = '77'
+        p.nmea_sentence = nmea_str
+        result = p.check_chksum()
+
+        self.assertTrue(result)
+
+    def test_checksum_fails_wrong_checksum(self):
+        parse_map = ('Checksum', 'checksum')
+        nmea_str = "$GPGLL,3751.65,S,14507.36,E*78"
+        p = NMEASentence(parse_map)
+        p.checksum = '78'
+        p.nmea_sentence = nmea_str
+        result = p.check_chksum()
+
+        self.assertFalse(result)
+
+    def test_checksum_fails_wrong_str(self):
+        parse_map = ('Checksum', 'checksum')
+        nmea_str = "$GPGLL,3751.65,S,14507.36,W*77"
+        p = NMEASentence(parse_map)
+        p.checksum = '77'
+        p.nmea_sentence = nmea_str
+        result = p.check_chksum()
+
+        self.assertFalse(result)
 
 class TestGPGLL(unittest.TestCase):
     def setUp(self):

@@ -1,3 +1,5 @@
+from pynmea.utils import checksum_calc
+
 class NMEASentence(object):
     """ Base sentence class. This is used to pull apart a sentence.
         It will not have any real reference to what things mean. Things that
@@ -13,6 +15,7 @@ class NMEASentence(object):
             parts attribute on the class and fill in the sentence type in
             sen_type
         """
+        self.nmea_sentence = nmea_str
         self.parts = nmea_str.split(',')
         if '*' in self.parts[-1]:
             d, par, ck = self.parts.pop().rpartition('*')
@@ -36,6 +39,16 @@ class NMEASentence(object):
         assert len(self.parts[1:]) <= len(self.parse_map)
         for index, item in enumerate(self.parts[1:]):
             setattr(self, self.parse_map[index][1], item)
+
+    def check_chksum(self):
+        # If there is no checksum, raise AssertionError
+        assert hasattr(self, 'checksum')
+
+        result = checksum_calc(self.nmea_sentence)
+        return (result.replace('0x', '') == self.checksum)
+
+
+
 
 # ---------------------------------------------------------------------------- #
 # Here are all the currently supported sentences. All should eventually be
