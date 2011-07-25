@@ -56,35 +56,6 @@ class NMEASentence(object):
 # implimented. Unit tests are also provided.
 # ---------------------------------------------------------------------------- #
 
-class GPGLL(NMEASentence):
-    def __init__(self):
-        parse_map = (("Latitude", "lat"),
-                     ("Direction", "lat_dir"),
-                     ("Longitude", "lon"),
-                     ("Direction", "lon_dir"),
-                     ("Checksum", "checksum"))
-
-        super(GPGLL, self).__init__(parse_map)
-
-    @property
-    def latitude(self):
-        return float(self.lat)
-
-    @property
-    def longitude(self):
-        return float(self.lon)
-
-    @property
-    def lat_direction(self):
-        mapping = {'N': 'North', 'S': 'South'}
-        return mapping[self.lat_dir.upper()]
-
-    @property
-    def lon_direction(self):
-        mapping = {"E": "East", "W": "West"}
-        return mapping[self.lon_dir.upper()]
-
-
 class GPBOD(NMEASentence):
     def __init__(self):
         # 045.,T,023.,M,DEST,START
@@ -154,6 +125,107 @@ class GPBWR(NMEASentence):
         super(GPBWR, self).__init__(parse_map)
 
 
+class GPGGA(NMEASentence):
+    def __init__(self):
+        parse_map = (
+            ('Timestamp', 'timestamp'),
+            ('Latitude', 'latitude'),
+            ('Latitude Direction', 'lat_direction'),
+            ('Longitude', 'longitude'),
+            ('Longitude Direction', 'lon_direction'),
+            ('GPS Quality Indicator', 'gps_qual'),
+            ('Number of Satellites in use', 'num_sats'),
+            ('Horizontal Dilution of Precision', 'horizontal_dil'),
+            ('Antenna Alt above sea level (mean)', 'antenna_altitude'),
+            ('Units of altitude (meters)', 'altitude_units'),
+            ('Geoidal Separation', 'geo_sep'),
+            ('Units of Geoidal Separation (meters)', 'geo_sep_units'),
+            ('Age of Differential GPS Data (secs)', 'age_gps_data'),
+            ('Differential Reference Station ID', 'ref_station_id'),
+            ('Checksum', 'checksum'))
+
+        super(GPGGA, self).__init__(parse_map)
+
+
+class GPGLL(NMEASentence):
+    def __init__(self):
+        parse_map = (
+            ('Latitude', 'lat'),
+            ('Latitude Direction', 'lat_dir'),
+            ('Longitude', 'lon'),
+            ('Longitude Direction', 'lon_dir'),
+            ('Timestamp', 'timestamp'),
+            ('Checksum', 'checksum'))
+
+        super(GPGLL, self).__init__(parse_map)
+        #self.check_chksum_calc = super(GPGLL, self).check_checksum
+
+        self._use_data_validity = False
+        float
+
+    def _parse(self, nmea_str):
+        """ GPGGL Allows for a couple of different formats.
+            The all have lat,direction,lon,direction
+
+            but one may have timestamp,data_validity
+            while the other has only checksum
+
+            We shall treat data_validity as a checksum and always
+            add in a timestamp field
+
+        """
+        self.nmea_sentence = nmea_str
+        self.parts = nmea_str.split(',')
+
+        if '*' in self.parts[-1]:
+            # There is a checksum but no timestamp + data_validity.
+            # Add an empty field for the timestamp and indicate that when
+            # validating the checksum, we should use validity, not a calculation
+            d, par, ck = self.parts.pop().rpartition('*')
+            self.parts.extend([d, '', ck])
+            self._use_data_validity = True
+
+        self.sen_type = self.parts[0]
+        if self.parts[0].startswith('$'):
+            self.parts[0] = self.parts[0][1:]
+        self.sen_type = self.parts[0]
+
+    def check_chksum(self):
+        """ Override check_checksum. If it has been detected that
+            the checksum field contains "A" for valid data and something else
+            for invalid, do a check based on thsi information. Otherwise, call
+            to original checksum code from the superclass
+        """
+        # If we are looking for an "A" character
+        if self._use_data_validity:
+            if self.checksum == 'A':
+                return True
+            else:
+                return False
+
+        else:
+            # Otherwise, call the superclass version
+            return super(GPGLL, self).check_chksum()
+
+    @property
+    def latitude(self):
+        return float(self.lat)
+
+    @property
+    def longitude(self):
+        return float(self.lon)
+
+    @property
+    def lat_direction(self):
+        mapping = {'N': 'North', 'S': 'South'}
+        return mapping[self.lat_dir.upper()]
+
+    @property
+    def lon_direction(self):
+        mapping = {"E": "East", "W": "West"}
+        return mapping[self.lon_dir.upper()]
+
+
 #class GPAAM(NMEASentence):
     #def __init__(self):
         #super(GPAAM).__init__()
@@ -188,7 +260,7 @@ class GPBWR(NMEASentence):
     #* $GPDCN - Decca Position
     #* $GPDPT - Depth
     #* $GPFSI - Frequency Set Information
-    #* $GPGGA - Global Positioning System Fix Data
+
     #* $GPGLC - Geographic Position, Loran-C
     #* $GPGSA - GPS DOP and Active Satellites
     #* $GPGSV - GPS Satellites in View

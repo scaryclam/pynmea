@@ -1,5 +1,5 @@
 import unittest
-from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR
+from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -71,44 +71,6 @@ class TestNMEAParse(unittest.TestCase):
         result = p.check_chksum()
 
         self.assertFalse(result)
-
-class TestGPGLL(unittest.TestCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    def test_parses_map(self):
-        p = GPGLL()
-        p.parse("$GPGLL,3751.65,S,14507.36,E*77")
-
-        self.assertEquals("GPGLL", p.sen_type)
-        self.assertEquals(p.parts,
-                          ['GPGLL', '3751.65', 'S', '14507.36', 'E', '77'])
-        self.assertEquals(p.lat, '3751.65')
-        self.assertEquals(p.lat_dir, 'S')
-        self.assertEquals(p.lon, '14507.36')
-        self.assertEquals(p.lon_dir, 'E')
-        self.assertEquals(p.checksum, '77')
-
-    def test_gets_properties(self):
-        p = GPGLL()
-        p.parse("$GPGLL,3751.65,S,14507.36,E*77")
-
-        self.assertEquals(p.latitude, 3751.65)
-        self.assertEquals(p.longitude, 14507.36)
-        self.assertEquals(p.lat_direction, 'South')
-        self.assertEquals(p.lon_direction, 'East')
-        self.assertEquals(p.checksum, "77")
-
-    def test_checksum_passes(self):
-        p = GPGLL()
-        p.parse("$GPGLL,3751.65,S,14507.36,E*77")
-        result = p.check_chksum()
-
-        self.assertTrue(result)
-
 
 class TestGPBOD(unittest.TestCase):
     def setUp(self):
@@ -199,6 +161,111 @@ class TestGPBWR(unittest.TestCase):
         self.assertEquals("N", p.range_unit)
         self.assertEquals("0001", p.waypoint_name)
         self.assertEquals("3E", p.checksum)
+
+
+class TestGPGGA(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPGGA()
+        p.parse("$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47")
+
+        self.assertEquals("GPGGA", p.sen_type)
+        self.assertEquals("123519", p.timestamp)
+        self.assertEquals("4807.038", p.latitude)
+        self.assertEquals("N", p.lat_direction)
+        self.assertEquals("01131.000", p.longitude)
+        self.assertEquals("E", p.lon_direction)
+        self.assertEquals("1", p.gps_qual)
+        self.assertEquals("08", p.num_sats)
+        self.assertEquals("0.9", p.horizontal_dil)
+        self.assertEquals("545.4", p.antenna_altitude)
+        self.assertEquals("M", p.altitude_units)
+        self.assertEquals("46.9", p.geo_sep)
+        self.assertEquals("M", p.geo_sep_units)
+        self.assertEquals("", p.age_gps_data)
+        self.assertEquals("", p.ref_station_id)
+        self.assertEquals("47", p.checksum)
+
+
+class TestGPGLL(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map1(self):
+        p = GPGLL()
+        p.parse("$GPGLL,3751.65,S,14507.36,E*77")
+
+        self.assertEquals("GPGLL", p.sen_type)
+        self.assertEquals("3751.65", p.lat)
+        self.assertEquals("S", p.lat_dir)
+        self.assertEquals("14507.36", p.lon)
+        self.assertEquals("E", p.lon_dir)
+        self.assertEquals("", p.timestamp)
+        self.assertEquals("77", p.checksum)
+
+    def test_parses_map2(self):
+        p = GPGLL()
+        p.parse("$GPGLL,4916.45,N,12311.12,W,225444,A")
+
+        self.assertEquals("GPGLL", p.sen_type)
+        self.assertEquals("4916.45", p.lat)
+        self.assertEquals("N", p.lat_dir)
+        self.assertEquals("12311.12", p.lon)
+        self.assertEquals("W", p.lon_dir)
+        self.assertEquals("225444", p.timestamp)
+        self.assertEquals("A", p.checksum)
+
+    def test_checksum_passes1(self):
+        p = GPGLL()
+        p.nmea_sentence = "$GPGLL,4916.45,N,12311.12,W,225444,A"
+        p.checksum = 'A'
+        p._use_data_validity = True
+
+        result = p.check_chksum()
+        self.assertTrue(result)
+
+    def test_checksum_fails1(self):
+        p = GPGLL()
+        p.nmea_sentence = "$GPGLL,4916.45,N,12311.12,W,225444,B"
+        p.checksum = 'B'
+        p._use_data_validity = True
+
+        result = p.check_chksum()
+        self.assertFalse(result)
+
+    def test_checksum_passes2(self):
+        p = GPGLL()
+        p.nmea_sentence = "$GPGLL,3751.65,S,14507.36,E*77"
+        p.checksum = '77'
+
+        result = p.check_chksum()
+        self.assertTrue(result)
+
+    def test_checksum_fails2(self):
+        p = GPGLL()
+        p.nmea_sentence = "$GPGLL,3751.65,S,14507.36,E*78"
+        p.checksum = '78'
+
+        result = p.check_chksum()
+        self.assertFalse(result)
+
+    def test_gets_properties(self):
+        p = GPGLL()
+        p.parse("$GPGLL,3751.65,S,14507.36,E*77")
+
+        self.assertEquals(p.latitude, float('3751.65'))
+        self.assertEquals(p.longitude, float('14507.36'))
+        self.assertEquals(p.lat_direction, 'South')
+        self.assertEquals(p.lon_direction, 'East')
+        self.assertEquals(p.checksum, "77")
 
 
 class TestUtils(unittest.TestCase):

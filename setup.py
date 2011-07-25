@@ -6,4 +6,5 @@ setup(name="pynmea",
       author="Becky Lewis",
       author_email="pynmea@scaryclam.co.uk",
       url="https://code.google.com/p/pynmea/",
+      license="MIT",
       packages=['pynmea'])
