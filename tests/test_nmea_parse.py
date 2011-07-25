@@ -1,5 +1,6 @@
 import unittest
 from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR
+from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
     def setUp(self):
@@ -20,7 +21,7 @@ class TestNMEAParse(unittest.TestCase):
 
         self.assertEquals("GPGLL", p.sen_type)
         self.assertEquals(p.parts,
-                          ['GPGLL', '3751.65', 'S', '14507.36', 'E', '*77'])
+                          ['GPGLL', '3751.65', 'S', '14507.36', 'E', '77'])
 
     def test_parse(self):
         parse_map = (("Latitude", "lat"),
@@ -34,12 +35,12 @@ class TestNMEAParse(unittest.TestCase):
 
         self.assertEquals("GPGLL", p.sen_type)
         self.assertEquals(p.parts,
-                          ['GPGLL', '3751.65', 'S', '14507.36', 'E', '*77'])
+                          ['GPGLL', '3751.65', 'S', '14507.36', 'E', '77'])
         self.assertEquals(p.lat, '3751.65')
         self.assertEquals(p.lat_dir, 'S')
         self.assertEquals(p.lon, '14507.36')
         self.assertEquals(p.lon_dir, 'E')
-        self.assertEquals(p.checksum, '*77')
+        self.assertEquals(p.checksum, '77')
 
 
 class TestGPGLL(unittest.TestCase):
@@ -55,12 +56,12 @@ class TestGPGLL(unittest.TestCase):
 
         self.assertEquals("GPGLL", p.sen_type)
         self.assertEquals(p.parts,
-                          ['GPGLL', '3751.65', 'S', '14507.36', 'E', '*77'])
+                          ['GPGLL', '3751.65', 'S', '14507.36', 'E', '77'])
         self.assertEquals(p.lat, '3751.65')
         self.assertEquals(p.lat_dir, 'S')
         self.assertEquals(p.lon, '14507.36')
         self.assertEquals(p.lon_dir, 'E')
-        self.assertEquals(p.checksum, '*77')
+        self.assertEquals(p.checksum, '77')
 
     def test_gets_properties(self):
         p = GPGLL()
@@ -70,7 +71,7 @@ class TestGPGLL(unittest.TestCase):
         self.assertEquals(p.longitude, 14507.36)
         self.assertEquals(p.lat_direction, 'South')
         self.assertEquals(p.lon_direction, 'East')
-        self.assertEquals(p.checksum, "*77")
+        self.assertEquals(p.checksum, "77")
 
 
 class TestGPBOD(unittest.TestCase):
@@ -128,7 +129,7 @@ class TestGPBWC(unittest.TestCase):
         self.assertEquals("0004.6", p.range_next)
         self.assertEquals("N", p.range_unit)
         self.assertEquals("EGLM", p.waypoint_name)
-        self.assertEquals("*11", p.checksum)
+        self.assertEquals("11", p.checksum)
 
 
 class TestGPBWR(unittest.TestCase):
@@ -154,4 +155,35 @@ class TestGPBWR(unittest.TestCase):
         self.assertEquals("47.664", p.range_next)
         self.assertEquals("N", p.range_unit)
         self.assertEquals("0001", p.waypoint_name)
-        self.assertEquals("*3E", p.checksum)
+        self.assertEquals("3E", p.checksum)
+
+
+class TestUtils(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_checksum_calc(self):
+        nmea_str1 = 'GPGLL,3751.65,S,14507.36,E'
+        nmea_str2 = '$GPGLL,3751.65,S,14507.36,E'
+        nmea_str3 = 'GPGLL,3751.65,S,14507.36,E*77'
+        nmea_str4 = '$GPGLL,3751.65,S,14507.36,E*77'
+        nmea_str5 = '$GPGLL,3751.65,S,14507.36,E*'
+        nmea_str6 = 'GPGLL,3751.65,S,14507.36,E*'
+
+        expected_chksum = 77
+        result1 = checksum_calc(nmea_str1)
+        result2 = checksum_calc(nmea_str2)
+        result3 = checksum_calc(nmea_str3)
+        result4 = checksum_calc(nmea_str4)
+        result5 = checksum_calc(nmea_str5)
+        result6 = checksum_calc(nmea_str6)
+
+        self.assertEquals(result1, '0x77')
+        self.assertEquals(result2, '0x77')
+        self.assertEquals(result3, '0x77')
+        self.assertEquals(result4, '0x77')
+        self.assertEquals(result5, '0x77')
+        self.assertEquals(result6, '0x77')

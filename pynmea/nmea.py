@@ -16,7 +16,7 @@ class NMEASentence(object):
         self.parts = nmea_str.split(',')
         if '*' in self.parts[-1]:
             d, par, ck = self.parts.pop().rpartition('*')
-            self.parts.extend([d, par+ck])
+            self.parts.extend([d, ck])
 
         self.sen_type = self.parts[0]
         if self.parts[0].startswith('$'):
