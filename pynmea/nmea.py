@@ -226,6 +226,32 @@ class GPGLL(NMEASentence):
         return mapping[self.lon_dir.upper()]
 
 
+class GPGSA(NMEASentence):
+    def __init__(self):
+        parse_map = (
+            ('Mode', 'mode'),
+            ('Mode fix type', 'mode_fix_type'),
+            ('SV ID01', 'sv_id01'),
+            ('SV ID02', 'sv_id02'),
+            ('SV ID03', 'sv_id03'),
+            ('SV ID04', 'sv_id04'),
+            ('SV ID05', 'sv_id05'),
+            ('SV ID06', 'sv_id06'),
+            ('SV ID07', 'sv_id07'),
+            ('SV ID08', 'sv_id08'),
+            ('SV ID09', 'sv_id09'),
+            ('SV ID10', 'sv_id10'),
+            ('SV ID11', 'sv_id11'),
+            ('SV ID12', 'sv_id12'),
+            ('PDOP (Dilution of precision)', 'pdop'),
+            ('HDOP (Horizontal DOP)', 'hdop'),
+            ('VDOP (Vertical DOP)', 'vdop'),
+            ('Checksum', 'checksum'))
+
+        super(GPGSA, self).__init__(parse_map)
+
+
+
 #class GPAAM(NMEASentence):
     #def __init__(self):
         #super(GPAAM).__init__()
@@ -262,7 +288,7 @@ class GPGLL(NMEASentence):
     #* $GPFSI - Frequency Set Information
 
     #* $GPGLC - Geographic Position, Loran-C
-    #* $GPGSA - GPS DOP and Active Satellites
+
     #* $GPGSV - GPS Satellites in View
     #* $GPGXA - TRANSIT Position
     #* $GPHDG - Heading, Deviation & Variation
