@@ -180,7 +180,8 @@ class GPGLL(NMEASentence):
         if '*' in self.parts[-1]:
             # There is a checksum but no timestamp + data_validity.
             # Add an empty field for the timestamp and indicate that when
-            # validating the checksum, we should use validity, not a calculation
+            # validating the checksum, we should use validity, not a
+            # calculation
             d, par, ck = self.parts.pop().rpartition('*')
             self.parts.extend([d, '', ck])
             self._use_data_validity = True
