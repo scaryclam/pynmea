@@ -1,5 +1,5 @@
 import unittest
-from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV
+from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -298,7 +298,7 @@ class TestGPGSA(unittest.TestCase):
         self.assertEquals("2.1", p.vdop)
         self.assertEquals("39", p.checksum)
 
-    def test_checsum_passes(self):
+    def test_checksum_passes(self):
         p = GPGSA()
         p.checksum = '39'
         p.nmea_sentence = "$GPGSA,A,3,04,05,,09,12,,,24,,,,,2.5,1.3,2.1*39"
@@ -307,7 +307,7 @@ class TestGPGSA(unittest.TestCase):
 
         self.assertTrue(result)
 
-    def test_checsum_fails(self):
+    def test_checksum_fails(self):
         p = GPGSA()
         p.checksum = '38'
         p.nmea_sentence = "$GPGSA,A,3,04,05,,09,12,,,24,,,,,2.5,1.3,2.1*38"
@@ -350,7 +350,7 @@ class TestGPGSV(unittest.TestCase):
         self.assertEquals('00', p.snr_4)
         self.assertEquals("74", p.checksum)
 
-    def test_checsum_passes(self):
+    def test_checksum_passes(self):
         p = GPGSV()
         p.checksum = '74'
         p.nmea_sentence = "$GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74"
@@ -359,10 +359,83 @@ class TestGPGSV(unittest.TestCase):
 
         self.assertTrue(result)
 
-    def test_checsum_fails(self):
+    def test_checksum_fails(self):
         p = GPGSV()
         p.checksum = '73'
         p.nmea_sentence = "$GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74"
+
+        result = p.check_chksum()
+
+        self.assertFalse(result)
+
+
+class TestGPHDG(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPHDG()
+        p.parse("$GPHDG,190.7,,E,0.0,E*7F")
+
+        self.assertEquals("GPHDG", p.sen_type)
+        self.assertEquals("190.7", p.heading)
+        self.assertEquals("", p.deviation)
+        self.assertEquals("E", p.dev_dir)
+        self.assertEquals("0.0", p.variation)
+        self.assertEquals("E", p.var_dir)
+        self.assertEquals("7F", p.checksum)
+
+    def test_checksum_passes(self):
+        p = GPHDG()
+        p.checksum = '7F'
+        p.nmea_sentence = "$GPHDG,190.7,,E,0.0,E*7F"
+
+        result = p.check_chksum()
+
+        self.assertTrue(result)
+
+    def test_checksum_fails(self):
+        p = GPHDG()
+        p.checksum = '7E'
+        p.nmea_sentence = "$GPHDG,190.7,,E,0.0,E*7E"
+
+        result = p.check_chksum()
+
+        self.assertFalse(result)
+
+
+class TestGPHDT(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPHDT()
+        p.parse("$GPHDT,227.66,T*02")
+
+        self.assertEquals("GPHDT", p.sen_type)
+        self.assertEquals("227.66", p.heading)
+        self.assertEquals("T", p.hdg_true)
+        self.assertEquals("02", p.checksum)
+
+    def test_checksum_passes(self):
+        p = GPHDT()
+        p.checksum = '02'
+        p.nmea_sentence = '$GPHDT,227.66,T*02'
+
+        result = p.check_chksum()
+
+        self.assertTrue(result)
+
+    def test_checksum_fails(self):
+        p = GPHDT()
+        p.checksum = '03'
+        p.nmea_sentence = '$GPHDT,227.66,T*03'
 
         result = p.check_chksum()
 
@@ -392,9 +465,9 @@ class TestUtils(unittest.TestCase):
         result5 = checksum_calc(nmea_str5)
         result6 = checksum_calc(nmea_str6)
 
-        self.assertEquals(result1, '0x77')
-        self.assertEquals(result2, '0x77')
-        self.assertEquals(result3, '0x77')
-        self.assertEquals(result4, '0x77')
-        self.assertEquals(result5, '0x77')
-        self.assertEquals(result6, '0x77')
+        self.assertEquals(result1, '77')
+        self.assertEquals(result2, '77')
+        self.assertEquals(result3, '77')
+        self.assertEquals(result4, '77')
+        self.assertEquals(result5, '77')
+        self.assertEquals(result6, '77')

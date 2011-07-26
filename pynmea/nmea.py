@@ -45,7 +45,7 @@ class NMEASentence(object):
         assert hasattr(self, 'checksum')
 
         result = checksum_calc(self.nmea_sentence)
-        return (result.replace('0x', '') == self.checksum)
+        return (result.upper() == self.checksum.upper())
 
 
 
@@ -279,6 +279,31 @@ class GPGSV(NMEASentence):
         super(GPGSV, self).__init__(parse_map)
 
 
+class GPHDG(NMEASentence):
+    """ NOTE! This is a GUESS as I cannot find an actual spec
+        telling me the fields. Updates are welcome!
+    """
+    def __init__(self):
+        parse_map = (
+            ("Heading", "heading"),
+            ("Deviation", "deviation"),
+            ("Deviation Direction", "dev_dir"),
+            ("Variation", "variation"),
+            ("Variation Direction", "var_dir"),
+            ("Checksum", "checksum"))
+
+        super(GPHDG, self).__init__(parse_map)
+
+
+class GPHDT(NMEASentence):
+    def __init__(self):
+        parse_map = (
+            ("Heading", "heading"),
+            ("True", "hdg_true"),
+            ("Checksum", "checksum"))
+
+        super(GPHDT, self).__init__(parse_map)
+
 
 #class GPAAM(NMEASentence):
     #def __init__(self):
@@ -317,10 +342,10 @@ class GPGSV(NMEASentence):
 
     #* $GPGLC - Geographic Position, Loran-C
 
-    #* $GPGSV - GPS Satellites in View
+
     #* $GPGXA - TRANSIT Position
-    #* $GPHDG - Heading, Deviation & Variation
-    #* $GPHDT - Heading, True
+
+
     #* $GPHSC - Heading Steering Command
     #* $GPLCD - Loran-C Signal Data
     #* $GPMTA - Air Temperature (to be phased out)
