@@ -251,6 +251,33 @@ class GPGSA(NMEASentence):
         super(GPGSA, self).__init__(parse_map)
 
 
+class GPGSV(NMEASentence):
+    def __init__(self):
+        parse_map = (
+            ('Number of messages of type in cycle', 'num_messages'),
+            ('Message Number', 'msg_num'),
+            ('Total number of SVs in view', 'num_sv_in_view'),
+            ('SV PRN number 1', 'sv_prn_num_1'),
+            ('Elevation in degrees 1', 'elevation_deg_1'), # 90 max
+            ('Azimuth, deg from true north 1', 'azimuth_1'), # 000 to 159
+            ('SNR 1', 'snr_1'), # 00-99 dB
+            ('SV PRN number 2', 'sv_prn_num_2'),
+            ('Elevation in degrees 2', 'elevation_deg_2'), # 90 max
+            ('Azimuth, deg from true north 2', 'azimuth_2'), # 000 to 159
+            ('SNR 2', 'snr_2'), # 00-99 dB
+            ('SV PRN number 3', 'sv_prn_num_3'),
+            ('Elevation in degrees 3', 'elevation_deg_3'), # 90 max
+            ('Azimuth, deg from true north 3', 'azimuth_3'), # 000 to 159
+            ('SNR 3', 'snr_3'), # 00-99 dB
+            ('SV PRN number 4', 'sv_prn_num_4'),
+            ('Elevation in degrees 4', 'elevation_deg_4'), # 90 max
+            ('Azimuth, deg from true north 4', 'azimuth_4'), # 000 to 159
+            ('SNR 4', 'snr_4'),  # 00-99 dB
+            ('Checksum', 'checksum'))
+
+        super(GPGSV, self).__init__(parse_map)
+
+
 
 #class GPAAM(NMEASentence):
     #def __init__(self):
