@@ -305,6 +305,20 @@ class GPHDT(NMEASentence):
         super(GPHDT, self).__init__(parse_map)
 
 
+class GPZDA(NMEASentence):
+    def __init__(self):
+        parse_map = (
+        ("Timestamp", "timestamp"), # hhmmss.ss = UTC
+        ("Day", "day"), # 01 to 31
+        ("Month", "month"), # 01 to 12
+        ("Year", "year"), # Year = YYYY
+        ("Local Zone Description", "local_zone"), # 00 to +/- 13 hours
+        ("Local Zone Minutes Description", "local_zone_minutes"), # same sign as hours
+        ("Checksum", "checksum"))
+
+        super(GPZDA, self).__init__(parse_map)
+
+
 #class GPAAM(NMEASentence):
     #def __init__(self):
         #super(GPAAM).__init__()
@@ -379,6 +393,6 @@ class GPHDT(NMEASentence):
     #* $GPXDR - Transducer Measurements
     #* $GPXTE - Cross-Track Error, Measured
     #* $GPXTR - Cross-Track Error, Dead Reckoning
-    #* $GPZDA - Time & Date
+
     #* $GPZFO - UTC & Time from Origin Waypoint
     #* $GPZTG - UTC & Time to Destination Waypoint

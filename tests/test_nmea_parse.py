@@ -1,5 +1,5 @@
 import unittest
-from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT
+from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -442,6 +442,45 @@ class TestGPHDT(unittest.TestCase):
         self.assertFalse(result)
 
 
+class TestGPZDA(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPZDA()
+        p.parse("$GPZDA,025959.000,01,01,1970,,*5B")
+
+        self.assertEquals("GPZDA", p.sen_type)
+        self.assertEquals("025959.000", p.timestamp)
+        self.assertEquals("01", p.day)
+        self.assertEquals("01", p.month)
+        self.assertEquals("1970", p.year)
+        self.assertEquals("", p.local_zone)
+        self.assertEquals("", p.local_zone_minutes)
+        self.assertEquals("5B", p.checksum)
+
+    def test_checksum_passes(self):
+        p = GPZDA()
+        p.checksum = '5B'
+        p.nmea_sentence = '$GPZDA,025959.000,01,01,1970,,*5B'
+
+        result = p.check_chksum()
+
+        self.assertTrue(result)
+
+    def test_checksum_fails(self):
+        p = GPZDA()
+        p.checksum = 'b5'
+        p.nmea_sentence = '$GPZDA,025959.000,01,01,1970,,*b5'
+
+        result = p.check_chksum()
+
+        self.assertFalse(result)
+
+
 class TestUtils(unittest.TestCase):
     def setUp(self):
         pass
@@ -456,14 +495,15 @@ class TestUtils(unittest.TestCase):
         nmea_str4 = '$GPGLL,3751.65,S,14507.36,E*77'
         nmea_str5 = '$GPGLL,3751.65,S,14507.36,E*'
         nmea_str6 = 'GPGLL,3751.65,S,14507.36,E*'
+        nmea_str7 = '$GPHDT,227.66,T*02'
 
-        expected_chksum = 77
         result1 = checksum_calc(nmea_str1)
         result2 = checksum_calc(nmea_str2)
         result3 = checksum_calc(nmea_str3)
         result4 = checksum_calc(nmea_str4)
         result5 = checksum_calc(nmea_str5)
         result6 = checksum_calc(nmea_str6)
+        result7 = checksum_calc(nmea_str7)
 
         self.assertEquals(result1, '77')
         self.assertEquals(result2, '77')
@@ -471,3 +511,4 @@ class TestUtils(unittest.TestCase):
         self.assertEquals(result4, '77')
         self.assertEquals(result5, '77')
         self.assertEquals(result6, '77')
+        self.assertEquals(result7, '02')
