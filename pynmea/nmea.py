@@ -305,6 +305,19 @@ class GPHDT(NMEASentence):
         super(GPHDT, self).__init__(parse_map)
 
 
+class GPSTN(NMEASentence):
+    """ NOTE: No real data could be found for examples of the actual spec so
+            it is a guess that there may be a checksum on the end
+    """
+    def __init__(self):
+        parse_map = (
+            ("Talker ID Number", "talker_id"), # 00 - 99
+            ("Checksum", "checksum"))
+
+
+        super(GPSTN, self).__init__(parse_map)
+
+
 class GPZDA(NMEASentence):
     def __init__(self):
         parse_map = (
@@ -378,7 +391,7 @@ class GPZDA(NMEASentence):
     #* $GPRSD - RADAR System Data
     #* $GPRTE - Routes
     #* $GPSFI - Scanning Frequency Information
-    #* $GPSTN - Multiple Data ID
+
     #* $GPTRF - Transit Fix Data
     #* $GPTTM - Tracked Target Message
     #* $GPVBW - Dual Ground/Water Speed

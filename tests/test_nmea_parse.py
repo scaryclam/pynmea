@@ -1,5 +1,5 @@
 import unittest
-from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA
+from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -479,6 +479,29 @@ class TestGPZDA(unittest.TestCase):
         result = p.check_chksum()
 
         self.assertFalse(result)
+
+
+class TestGPSTN(unittest.TestCase):
+    def setup(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map1(self):
+        p = GPSTN()
+        p.parse("$GPSTN,10")
+
+        self.assertEquals("GPSTN", p.sen_type)
+        self.assertEquals("10", p.talker_id)
+
+    def test_parses_map2(self):
+        p = GPSTN()
+        p.parse("$GPSTN,10*73")
+
+        self.assertEquals("GPSTN", p.sen_type)
+        self.assertEquals("10", p.talker_id)
+        self.assertEquals("73", p.checksum)
 
 
 class TestUtils(unittest.TestCase):
