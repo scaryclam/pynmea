@@ -1,5 +1,5 @@
 import unittest
-from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA
+from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -266,6 +266,107 @@ class TestGPGLL(unittest.TestCase):
         self.assertEquals(p.lat_direction, 'South')
         self.assertEquals(p.lon_direction, 'East')
         self.assertEquals(p.checksum, "77")
+
+class TestGPGSA(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPGSA()
+        p.parse("$GPGSA,A,3,04,05,,09,12,,,24,,,,,2.5,1.3,2.1*39")
+
+        self.assertEquals("GPGSA", p.sen_type)
+        self.assertEquals("A", p.mode)
+        self.assertEquals("3", p.mode_fix_type)
+        self.assertEquals("04", p.sv_id01)
+        self.assertEquals("05", p.sv_id02)
+        self.assertEquals("", p.sv_id03)
+        self.assertEquals("09", p.sv_id04)
+        self.assertEquals("12", p.sv_id05)
+        self.assertEquals("", p.sv_id06)
+        self.assertEquals("", p.sv_id07)
+        self.assertEquals("24", p.sv_id08)
+        self.assertEquals("", p.sv_id09)
+        self.assertEquals("", p.sv_id10)
+        self.assertEquals("", p.sv_id11)
+        self.assertEquals("", p.sv_id12)
+        self.assertEquals("2.5", p.pdop)
+        self.assertEquals("1.3", p.hdop)
+        self.assertEquals("2.1", p.vdop)
+        self.assertEquals("39", p.checksum)
+
+    def test_checsum_passes(self):
+        p = GPGSA()
+        p.checksum = '39'
+        p.nmea_sentence = "$GPGSA,A,3,04,05,,09,12,,,24,,,,,2.5,1.3,2.1*39"
+
+        result = p.check_chksum()
+
+        self.assertTrue(result)
+
+    def test_checsum_fails(self):
+        p = GPGSA()
+        p.checksum = '38'
+        p.nmea_sentence = "$GPGSA,A,3,04,05,,09,12,,,24,,,,,2.5,1.3,2.1*38"
+
+        result = p.check_chksum()
+
+        self.assertFalse(result)
+
+
+class TestGPGSV(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPGSV()
+        p.parse("$GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74")
+
+        self.assertEquals("GPGSV", p.sen_type)
+        self.assertEquals('3', p.num_messages)
+        self.assertEquals('1', p.msg_num)
+        self.assertEquals('11', p.num_sv_in_view)
+        self.assertEquals('03', p.sv_prn_num_1)
+        self.assertEquals('03', p.elevation_deg_1)
+        self.assertEquals('111', p.azimuth_1)
+        self.assertEquals('00', p.snr_1)
+        self.assertEquals('04', p.sv_prn_num_2)
+        self.assertEquals('15', p.elevation_deg_2)
+        self.assertEquals('270', p.azimuth_2)
+        self.assertEquals('00', p.snr_2)
+        self.assertEquals('06', p.sv_prn_num_3)
+        self.assertEquals('01', p.elevation_deg_3)
+        self.assertEquals('010', p.azimuth_3)
+        self.assertEquals('00', p.snr_3)
+        self.assertEquals('13', p.sv_prn_num_4)
+        self.assertEquals('06', p.elevation_deg_4)
+        self.assertEquals('292', p.azimuth_4)
+        self.assertEquals('00', p.snr_4)
+        self.assertEquals("74", p.checksum)
+
+    def test_checsum_passes(self):
+        p = GPGSV()
+        p.checksum = '74'
+        p.nmea_sentence = "$GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74"
+
+        result = p.check_chksum()
+
+        self.assertTrue(result)
+
+    def test_checsum_fails(self):
+        p = GPGSV()
+        p.checksum = '73'
+        p.nmea_sentence = "$GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74"
+
+        result = p.check_chksum()
+
+        self.assertFalse(result)
 
 
 class TestUtils(unittest.TestCase):
