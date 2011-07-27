@@ -332,6 +332,24 @@ class GPZDA(NMEASentence):
         super(GPZDA, self).__init__(parse_map)
 
 
+class GPRMA(NMEASentence):
+    def __init__(self):
+        parse_map = (
+            ("Data status", "data_status"),
+            ("Latitude", "lat"),
+            ("Latitude Direction", "lat_dir"),
+            ("Longitude", "lon"),
+            ("Longitude Direction", "lon_dir"),
+            ("Not Used 1", "not_used_1"),
+            ("Not Used 2", "not_used_2"),
+            ("Speed over ground", "spd_over_grnd"), # Knots
+            ("Course over ground", "crse_over_grnd"),
+            ("Variation", "variation"),
+            ("Variation Direction", "var_dir"),
+            ("Checksum", "checksum"))
+
+        super(GPRMA, self).__init__(parse_map)
+
 #class GPAAM(NMEASentence):
     #def __init__(self):
         #super(GPAAM).__init__()

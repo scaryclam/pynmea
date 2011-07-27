@@ -1,5 +1,5 @@
 import unittest
-from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN
+from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -439,6 +439,46 @@ class TestGPHDT(unittest.TestCase):
 
         result = p.check_chksum()
 
+        self.assertFalse(result)
+
+
+class TestGPRMA(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPRMA()
+        p.parse("$GPRMA,A,4630.129,N,147.372,W,,,12.2,5,7,N*51")
+
+        self.assertEquals("GPRMA", p.sen_type)
+        self.assertEquals("A", p.data_status)
+        self.assertEquals("4630.129", p.lat)
+        self.assertEquals("N", p.lat_dir)
+        self.assertEquals("147.372", p.lon)
+        self.assertEquals("W", p.lon_dir)
+        self.assertEquals("", p.not_used_1)
+        self.assertEquals("", p.not_used_2)
+        self.assertEquals("12.2", p.spd_over_grnd)
+        self.assertEquals("5", p.crse_over_grnd)
+        self.assertEquals("7", p.variation)
+        self.assertEquals("N", p.var_dir)
+        self.assertEquals("51", p.checksum)
+
+    def test_checksum_passes(self):
+        p = GPRMA()
+        p.checksum = '51'
+        p.nmea_sentence = '$GPRMA,A,4630.129,N,147.372,W,,,12.2,5,7,N*51'
+        result = p.check_chksum()
+        self.assertTrue(result)
+
+    def test_checksum_fails(self):
+        p = GPRMA()
+        p.checksum = '52'
+        p.nmea_sentence = '$GPRMA,A,4630.129,N,147.372,W,,,12.2,5,7,N*52'
+        result = p.check_chksum()
         self.assertFalse(result)
 
 
