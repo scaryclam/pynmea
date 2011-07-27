@@ -1,5 +1,5 @@
 import unittest
-from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA
+from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA, GPRTE
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -478,6 +478,57 @@ class TestGPRMA(unittest.TestCase):
         p = GPRMA()
         p.checksum = '52'
         p.nmea_sentence = '$GPRMA,A,4630.129,N,147.372,W,,,12.2,5,7,N*52'
+        result = p.check_chksum()
+        self.assertFalse(result)
+
+
+class TestGPRTE(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map1(self):
+        p = GPRTE()
+        p.parse("$GPRTE,2,1,c,0,PBRCPK,PBRTO,PTELGR,PPLAND,PYAMBU,PPFAIR,PWARRN,PMORTL,PLISMR*73")
+
+        self.assertEquals("GPRTE", p.sen_type)
+        self.assertEquals("2", p.num_in_seq)
+        self.assertEquals("1", p.sen_num)
+        self.assertEquals("c", p.start_type)
+        self.assertEquals("0", p.active_route_id)
+        self.assertEquals(["PBRCPK", "PBRTO", "PTELGR", "PPLAND", "PYAMBU",
+                           "PPFAIR", "PWARRN", "PMORTL", "PLISMR"],
+                          p.waypoint_list)
+        self.assertEquals("73", p.checksum)
+
+    def test_parses_map2(self):
+        p = GPRTE()
+        p.parse("$GPRTE,2,2,c,0,PCRESY,GRYRIE,GCORIO,GWERR,GWESTG,7FED*34")
+        self.assertEquals("GPRTE", p.sen_type)
+        self.assertEquals("2", p.num_in_seq)
+        self.assertEquals("2", p.sen_num)
+        self.assertEquals("c", p.start_type)
+        self.assertEquals("0", p.active_route_id)
+        self.assertEquals(
+            ["PCRESY", "GRYRIE", "GCORIO", "GWERR", "GWESTG", "7FED"],
+            p.waypoint_list)
+        self.assertEquals("34", p.checksum)
+
+    def test_checksum_passes(self):
+        p = GPRTE()
+        p.checksum = "73"
+        p.nmea_sentence = "$GPRTE,2,1,c,0,PBRCPK,PBRTO,PTELGR,PPLAND,PYAMBU,PPFAIR,PWARRN,PMORTL,PLISMR*73"
+
+        result = p.check_chksum()
+        self.assertTrue(result)
+
+    def test_checksum_fails(self):
+        p = GPRTE()
+        p.checksum = "74"
+        p.nmea_sentence = "$GPRTE,2,1,c,0,PBRCPK,PBRTO,PTELGR,PPLAND,PYAMBU,PPFAIR,PWARRN,PMORTL,PLISMR*74"
+
         result = p.check_chksum()
         self.assertFalse(result)
 

@@ -350,6 +350,38 @@ class GPRMA(NMEASentence):
 
         super(GPRMA, self).__init__(parse_map)
 
+
+class GPRTE(NMEASentence):
+    """ Routes
+    """
+    def __init__(self):
+        parse_map = (
+            ("Number of sentences in sequence", "num_in_seq"),
+            ("Sentence Number", "sen_num"),
+            ("Start Type", "start_type"), # The first in the list is either current route or waypoint
+            ("Name or Number of Active Route", "active_route_id"),
+            ("Waypoint List", "waypoint_list"),
+            ("Checksum", "checksum"))
+
+        super(GPRTE, self).__init__(parse_map)
+
+    def parse(self, nmea_str):
+        """ As the length of the sentence is variable (there can be many or few
+            waypoints), parse is overridden to do something special with the
+            different parts
+        """
+        self._parse(nmea_str)
+
+        new_parts = []
+        new_parts.extend(self.parts[0:5])
+        new_parts.append(self.parts[5:-1])
+        new_parts.append(self.parts[-1])
+
+        self.parts = new_parts
+
+        for index, item in enumerate(self.parts[1:]):
+            setattr(self, self.parse_map[index][1], item)
+
 #class GPAAM(NMEASentence):
     #def __init__(self):
         #super(GPAAM).__init__()
@@ -400,14 +432,14 @@ class GPRMA(NMEASentence):
     #* $GPOLN - Omega Lane Numbers
     #* $GPOSD - Own Ship Data
     #* $GPR00 - Waypoint active route (not standard)
-    #* $GPRMA - Recommended Minimum Specific Loran-C Data
+
     #* $GPRMB - Recommended Minimum Navigation Information
     #* $GPRMC - Recommended Minimum Specific GPS/TRANSIT Data
     #* $GPROT - Rate of Turn
     #* $GPRPM - Revolutions
     #* $GPRSA - Rudder Sensor Angle
     #* $GPRSD - RADAR System Data
-    #* $GPRTE - Routes
+
     #* $GPSFI - Scanning Frequency Information
 
     #* $GPTRF - Transit Fix Data
