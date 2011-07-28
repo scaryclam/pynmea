@@ -305,31 +305,29 @@ class GPHDT(NMEASentence):
         super(GPHDT, self).__init__(parse_map)
 
 
-class GPSTN(NMEASentence):
-    """ NOTE: No real data could be found for examples of the actual spec so
-            it is a guess that there may be a checksum on the end
-    """
+class GPR00(NMEASentence):
     def __init__(self):
         parse_map = (
-            ("Talker ID Number", "talker_id"), # 00 - 99
+            ("Waypoint List", "waypoint_list"),
             ("Checksum", "checksum"))
 
+        super(GPR00, self).__init__(parse_map)
 
-        super(GPSTN, self).__init__(parse_map)
+    def parse(self, nmea_str):
+        """ As the length of the sentence is variable (there can be many or few
+            waypoints), parse is overridden to do something special with the
+            different parts
+        """
+        self._parse(nmea_str)
 
+        new_parts = [self.parts[0]]
+        new_parts.append(self.parts[1:-1])
+        new_parts.append(self.parts[-1])
 
-class GPZDA(NMEASentence):
-    def __init__(self):
-        parse_map = (
-        ("Timestamp", "timestamp"), # hhmmss.ss = UTC
-        ("Day", "day"), # 01 to 31
-        ("Month", "month"), # 01 to 12
-        ("Year", "year"), # Year = YYYY
-        ("Local Zone Description", "local_zone"), # 00 to +/- 13 hours
-        ("Local Zone Minutes Description", "local_zone_minutes"), # same sign as hours
-        ("Checksum", "checksum"))
+        self.parts = new_parts
 
-        super(GPZDA, self).__init__(parse_map)
+        for index, item in enumerate(self.parts[1:]):
+            setattr(self, self.parse_map[index][1], item)
 
 
 class GPRMA(NMEASentence):
@@ -382,80 +380,359 @@ class GPRTE(NMEASentence):
         for index, item in enumerate(self.parts[1:]):
             setattr(self, self.parse_map[index][1], item)
 
+
+class GPSTN(NMEASentence):
+    """ NOTE: No real data could be found for examples of the actual spec so
+            it is a guess that there may be a checksum on the end
+    """
+    def __init__(self):
+        parse_map = (
+            ("Talker ID Number", "talker_id"), # 00 - 99
+            ("Checksum", "checksum"))
+
+
+        super(GPSTN, self).__init__(parse_map)
+
+
+class GPTRF(NMEASentence):
+    """ Transit Fix Data
+    """
+    def __init__(self):
+        parse_map = (
+            ("Timestamp (UTC)", "timestamp"),
+            ("Date (DD/MM/YY", "date"),
+            ("Latitude", "lat"),
+            ("Latitude Direction", "lat_dir"),
+            ("Longitude", "lon"),
+            ("Longitude Direction", "lon_dir"),
+            ("Elevation Angle", "ele_angle"),
+            ("Number of Iterations", "num_iterations"),
+            ("Number of Doppler Intervals", "num_doppler_intervals"),
+            ("Update Distance", "update_dist"), # Nautical Miles
+            ("Satellite ID", "sat_id"))
+
+        super(GPTRF, self).__init__(parse_map)
+
+
+class GPZDA(NMEASentence):
+    def __init__(self):
+        parse_map = (
+        ("Timestamp", "timestamp"), # hhmmss.ss = UTC
+        ("Day", "day"), # 01 to 31
+        ("Month", "month"), # 01 to 12
+        ("Year", "year"), # Year = YYYY
+        ("Local Zone Description", "local_zone"), # 00 to +/- 13 hours
+        ("Local Zone Minutes Description", "local_zone_minutes"), # same sign as hours
+        ("Checksum", "checksum"))
+
+        super(GPZDA, self).__init__(parse_map)
+
+
+# ---------------------------------- Not Yet Implimented --------------------- #
+# ---------------------------------------------------------------------------- #
+
 #class GPAAM(NMEASentence):
-    #def __init__(self):
-        #super(GPAAM).__init__()
+#    """
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPAAM).__init__()
 
 
 #class GPALM(NMEASentence):
-    #def __init__(self):
-        #super(GPALM).__init__()
+#    """
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPALM).__init__()
 
 
 #class GPAPA(NMEASentence):
-    #def __init__(self):
-        #super(GPAPA).__init__()
+#    """
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPAPA).__init__()
 
 
 #class GPAPB(NMEASentence):
-    #def __init__(self):
-        #super(GPAPB).__init__()
+#    """
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPAPB).__init__()
 
 
 #class GPASD(NMEASentence):
-    #def __init__(self):
-        #super(GPASD).__init__()
+#    """
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPASD).__init__()
 
+#class GPBEC(NMEASentence):
+#    """ Bearing & Distance to Waypoint, Dead Reckoning
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPBEC).__init__(parse_map)
 
-    #* $GPBEC - Bearing & Distance to Waypoint, Dead Reckoning
+#class GPBWW(NMEASentence):
+#    """ Bearing, Waypoint to Waypoint
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPBWW).__init__(parse_map)
 
+#class GPDBT(NMEASentence):
+#    """ Depth Below Transducer
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPDBT).__init__(parse_map)
 
+#class GPDCN(NMEASentence):
+#    """ Decca Position
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPDCN).__init__(parse_map)
 
-    #* $GPBWW - Bearing, Waypoint to Waypoint
-    #* $GPDBT - Depth Below Transducer
-    #* $GPDCN - Decca Position
-    #* $GPDPT - Depth
-    #* $GPFSI - Frequency Set Information
+#class GPDPT(NMEASentence):
+#    """ Depth
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPDPT).__init__(parse_map)
 
-    #* $GPGLC - Geographic Position, Loran-C
+#class GPFSI(NMEASentence):
+#    """ Frequency Set Information
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPFSI).__init__(parse_map)
 
+#class GPGLC(NMEASentence):
+#    """ Geographic Position, Loran-C
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPGLC).__init__(parse_map)
 
-    #* $GPGXA - TRANSIT Position
+#class GPGXA(NMEASentence):
+#    """ TRANSIT Position
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPGXA).__init__(parse_map)
 
+#class GPHSC(NMEASentence):
+#    """ Heading Steering Command
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPHSC).__init__(parse_map)
 
-    #* $GPHSC - Heading Steering Command
-    #* $GPLCD - Loran-C Signal Data
-    #* $GPMTA - Air Temperature (to be phased out)
-    #* $GPMTW - Water Temperature
-    #* $GPMWD - Wind Direction
-    #* $GPMWV - Wind Speed and Angle
-    #* $GPOLN - Omega Lane Numbers
-    #* $GPOSD - Own Ship Data
-    #* $GPR00 - Waypoint active route (not standard)
+#class GPLCD(NMEASentence):
+#    """ Loran-C Signal Data
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPLCD).__init__(parse_map)
 
-    #* $GPRMB - Recommended Minimum Navigation Information
-    #* $GPRMC - Recommended Minimum Specific GPS/TRANSIT Data
-    #* $GPROT - Rate of Turn
-    #* $GPRPM - Revolutions
-    #* $GPRSA - Rudder Sensor Angle
-    #* $GPRSD - RADAR System Data
+#class GPMTA(NMEASentence):
+#    """ Air Temperature (to be phased out)
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPMTA).__init__(parse_map)
 
-    #* $GPSFI - Scanning Frequency Information
+#class GPMTW(NMEASentence):
+#    """ Water Temperature
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPMTW).__init__(parse_map)
 
-    #* $GPTRF - Transit Fix Data
-    #* $GPTTM - Tracked Target Message
-    #* $GPVBW - Dual Ground/Water Speed
-    #* $GPVDR - Set and Drift
-    #* $GPVHW - Water Speed and Heading
-    #* $GPVLW - Distance Traveled through the Water
-    #* $GPVPW - Speed, Measured Parallel to Wind
-    #* $GPVTG - Track Made Good and Ground Speed
-    #* $GPWCV - Waypoint Closure Velocity
-    #* $GPWNC - Distance, Waypoint to Waypoint
-    #* $GPWPL - Waypoint Location
-    #* $GPXDR - Transducer Measurements
-    #* $GPXTE - Cross-Track Error, Measured
-    #* $GPXTR - Cross-Track Error, Dead Reckoning
+#class GPMWD(NMEASentence):
+#    """ Wind Direction
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPMWD).__init__(parse_map)
 
-    #* $GPZFO - UTC & Time from Origin Waypoint
-    #* $GPZTG - UTC & Time to Destination Waypoint
+#class GPMWV(NMEASentence):
+#    """ Wind Speed and Angle
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPMWV).__init__(parse_map)
+
+#class GPOLN(NMEASentence):
+#    """ Omega Lane Numbers
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPOLN).__init__(parse_map)
+
+#class GPOSD(NMEASentence):
+#    """ Own Ship Data
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPOSD).__init__(parse_map)
+
+#class GPRMB(NMEASentence):
+#    """ Recommended Minimum Navigation Information
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPRMB).__init__(parse_map)
+
+#class GPRMC(NMEASentence):
+#    """ Recommended Minimum Specific GPS/TRANSIT Data
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPRMC).__init__(parse_map)
+
+#class GPROT(NMEASentence):
+#    """ Rate of Turn
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPROT).__init__(parse_map)
+
+#class GPRPM(NMEASentence):
+#    """ Revolutions
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPRPM).__init__(parse_map)
+
+#class GPRSA(NMEASentence):
+#    """ Rudder Sensor Angle
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPRSA).__init__(parse_map)
+
+#class GPRSD(NMEASentence):
+#    """ RADAR System Data
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPRSD).__init__(parse_map)
+
+#class GPSFI(NMEASentence):
+#    """ Scanning Frequency Information
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPSFI).__init__(parse_map)
+
+#class GPTTM(NMEASentence):
+#    """ Tracked Target Message
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPTTM).__init__(parse_map)
+
+#class GPVBW(NMEASentence):
+#    """ Dual Ground/Water Speed
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPVBW).__init__(parse_map)
+
+#class GPVDR(NMEASentence):
+#    """ Set and Drift
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPVDR).__init__(parse_map)
+
+#class GPVHW(NMEASentence):
+#    """ Water Speed and Heading
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPVHW).__init__(parse_map)
+
+#class GPVLW(NMEASentence):
+#    """ Distance Traveled through the Water
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPVLW).__init__(parse_map)
+
+#class GPVPW(NMEASentence):
+#    """ Speed, Measured Parallel to Wind
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPVPW).__init__(parse_map)
+
+#class GPVTG(NMEASentence):
+#    """ Track Made Good and Ground Speed
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPVTG).__init__(parse_map)
+
+#class GPWCV(NMEASentence):
+#    """ Waypoint Closure Velocity
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPWCV).__init__(parse_map)
+
+#class GPWNC(NMEASentence):
+#    """ Distance, Waypoint to Waypoint
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPWNC).__init__(parse_map)
+
+#class GPWPL(NMEASentence):
+#    """ Waypoint Location
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPWPL).__init__(parse_map)
+
+#class GPXDR(NMEASentence):
+#    """ Transducer Measurements
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPXDR).__init__(parse_map)
+
+#class GPXTE(NMEASentence):
+#    """ Cross-Track Error, Measured
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPXTE).__init__(parse_map)
+
+#class GPXTR(NMEASentence):
+#    """ Cross-Track Error, Dead Reckoning
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPXTR).__init__(parse_map)
+
+#class GPZFO(NMEASentence):
+#    """ UTC & Time from Origin Waypoint
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPZFO).__init__(parse_map)
+
+#class GPZTG(NMEASentence):
+#    """ UTC & Time to Destination Waypoint
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPZTG).__init__(parse_map)
+

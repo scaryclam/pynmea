@@ -1,5 +1,5 @@
 import unittest
-from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA, GPRTE
+from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA, GPRTE, GPR00, GPTRF
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -442,6 +442,52 @@ class TestGPHDT(unittest.TestCase):
         self.assertFalse(result)
 
 
+class TestGPR00(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map_1(self):
+        p = GPR00()
+        p.parse("$GPR00,EGLL,EGLM,EGTB,EGUB,EGTK,MBOT,EGTB,,,,,,,*58")
+
+        self.assertEquals("GPR00", p.sen_type)
+        self.assertEquals(['EGLL', 'EGLM', 'EGTB', 'EGUB', 'EGTK', 'MBOT',
+                           'EGTB', '', '', '', '', '', '', ''],
+                          p.waypoint_list)
+        self.assertEquals("58", p.checksum)
+
+    def test_parses_map_2(self):
+        p = GPR00()
+        p.parse("$GPR00,MINST,CHATN,CHAT1,CHATW,CHATM,CHATE,003,004,005,006,007,,,*05")
+
+        self.assertEquals("GPR00", p.sen_type)
+        self.assertEquals(['MINST', 'CHATN', 'CHAT1', 'CHATW', 'CHATM', 'CHATE',
+                           '003', '004', '005', '006', '007', '', '', ''],
+                          p.waypoint_list)
+        self.assertEquals("05", p.checksum)
+
+    def test_checksum_passes(self):
+        p = GPR00()
+        p.checksum = '58'
+        p.nmea_sentence = "$GPR00,EGLL,EGLM,EGTB,EGUB,EGTK,MBOT,EGTB,,,,,,,*58"
+
+        result = p.check_chksum()
+
+        self.assertTrue(result)
+
+    def test_checksum_fails(self):
+        p = GPR00()
+        p.checksum = '57'
+        p.nmea_sentence = "$GPR00,EGLL,EGLM,EGTB,EGUB,EGTK,MBOT,EGTB,,,,,,,*57"
+
+        result = p.check_chksum()
+
+        self.assertFalse(result)
+
+
 class TestGPRMA(unittest.TestCase):
     def setUp(self):
         pass
@@ -533,6 +579,54 @@ class TestGPRTE(unittest.TestCase):
         self.assertFalse(result)
 
 
+class TestGPSTN(unittest.TestCase):
+    def setup(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map1(self):
+        p = GPSTN()
+        p.parse("$GPSTN,10")
+
+        self.assertEquals("GPSTN", p.sen_type)
+        self.assertEquals("10", p.talker_id)
+
+    def test_parses_map2(self):
+        p = GPSTN()
+        p.parse("$GPSTN,10*73")
+
+        self.assertEquals("GPSTN", p.sen_type)
+        self.assertEquals("10", p.talker_id)
+        self.assertEquals("73", p.checksum)
+
+
+class TestGPTRF(unittest.TestCase):
+    def setup(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPTRF()
+        p.parse("$GPTRF,121314.15,020112,123.321,N,0987.232,W,2.3,4.5,6.7,8.9,ABC")
+
+        self.assertEquals("GPTRF", p.sen_type)
+        self.assertEquals("121314.15", p.timestamp)
+        self.assertEquals("020112", p.date)
+        self.assertEquals("123.321", p.lat)
+        self.assertEquals("N", p.lat_dir)
+        self.assertEquals("0987.232", p.lon)
+        self.assertEquals("W", p.lon_dir)
+        self.assertEquals("2.3", p.ele_angle)
+        self.assertEquals("4.5", p.num_iterations)
+        self.assertEquals("6.7", p.num_doppler_intervals)
+        self.assertEquals("8.9", p.update_dist)
+        self.assertEquals("ABC", p.sat_id)
+
+
 class TestGPZDA(unittest.TestCase):
     def setUp(self):
         pass
@@ -570,29 +664,6 @@ class TestGPZDA(unittest.TestCase):
         result = p.check_chksum()
 
         self.assertFalse(result)
-
-
-class TestGPSTN(unittest.TestCase):
-    def setup(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    def test_parses_map1(self):
-        p = GPSTN()
-        p.parse("$GPSTN,10")
-
-        self.assertEquals("GPSTN", p.sen_type)
-        self.assertEquals("10", p.talker_id)
-
-    def test_parses_map2(self):
-        p = GPSTN()
-        p.parse("$GPSTN,10*73")
-
-        self.assertEquals("GPSTN", p.sen_type)
-        self.assertEquals("10", p.talker_id)
-        self.assertEquals("73", p.checksum)
 
 
 class TestUtils(unittest.TestCase):
