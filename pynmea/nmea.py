@@ -349,6 +349,28 @@ class GPRMA(NMEASentence):
         super(GPRMA, self).__init__(parse_map)
 
 
+class GPRMB(NMEASentence):
+    """ Recommended Minimum Navigation Information
+    """
+    def __init__(self):
+        parse_map = (
+            ("Data Validity", "validity"),
+            ("Cross Track Error", "cross_track_error"), # nautical miles, 9.9 max
+            ("Cross Track Error, direction to corrent", "cte_correction_dir"),
+            ("Origin Waypoint ID", "origin_waypoint_id"),
+            ("Destination Waypoint ID", "dest_waypoint_id"),
+            ("Destination Waypoint Latitude", "dest_lat"),
+            ("Destination Waypoint Lat Direction", "dest_lat_dir"),
+            ("Destination Waypoint Longitude", "dest_lon"),
+            ("Destination Waypoint Lon Direction", "dest_lon_dir"),
+            ("Range to Destination", "dest_range"), # Nautical Miles
+            ("True Bearing to Destination", "dest_true_bearing"),
+            ("Velocity Towards Destination", "dest_velocity"), # Knots
+            ("Arrival Alarm", "arrival_alarm"), # A = Arrived, V = Not arrived
+            ("Checksum", "checksum"))
+        super(GPRMB, self).__init__(parse_map)
+
+
 class GPRTE(NMEASentence):
     """ Routes
     """
@@ -581,13 +603,6 @@ class GPZDA(NMEASentence):
 #    def __init__(self):
 #        parse_map = ()
 #        super(GPOSD).__init__(parse_map)
-
-#class GPRMB(NMEASentence):
-#    """ Recommended Minimum Navigation Information
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPRMB).__init__(parse_map)
 
 #class GPRMC(NMEASentence):
 #    """ Recommended Minimum Specific GPS/TRANSIT Data

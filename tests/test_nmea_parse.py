@@ -1,5 +1,5 @@
 import unittest
-from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA, GPRTE, GPR00, GPTRF
+from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA, GPRMB, GPRTE, GPR00, GPTRF
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -524,6 +524,88 @@ class TestGPRMA(unittest.TestCase):
         p = GPRMA()
         p.checksum = '52'
         p.nmea_sentence = '$GPRMA,A,4630.129,N,147.372,W,,,12.2,5,7,N*52'
+        result = p.check_chksum()
+        self.assertFalse(result)
+
+
+class TestGPRMB(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map_1(self):
+        p = GPRMB()
+        p.parse("$GPRMB,A,0.66,L,003,004,4917.24,N,12309.57,W,001.3,052.5,000.5,V*20")
+
+        self.assertEquals("GPRMB", p.sen_type)
+        self.assertEquals("A", p.validity)
+        self.assertEquals("0.66", p.cross_track_error)
+        self.assertEquals("L", p.cte_correction_dir)
+        self.assertEquals("003", p.origin_waypoint_id)
+        self.assertEquals("004", p.dest_waypoint_id)
+        self.assertEquals("4917.24", p.dest_lat)
+        self.assertEquals("N", p.dest_lat_dir)
+        self.assertEquals("12309.57", p.dest_lon)
+        self.assertEquals("W", p.dest_lon_dir)
+        self.assertEquals("001.3", p.dest_range)
+        self.assertEquals("052.5", p.dest_true_bearing)
+        self.assertEquals("000.5", p.dest_velocity)
+        self.assertEquals("V", p.arrival_alarm)
+        self.assertEquals("20", p.checksum)
+
+    def test_parses_map_2(self):
+        p = GPRMB()
+        p.parse("$GPRMB,A,4.08,L,EGLL,EGLM,5130.02,N,00046.34,W,004.6,213.9,122.9,A*3D")
+
+        self.assertEquals("GPRMB", p.sen_type)
+        self.assertEquals("A", p.validity)
+        self.assertEquals("4.08", p.cross_track_error)
+        self.assertEquals("L", p.cte_correction_dir)
+        self.assertEquals("EGLL", p.origin_waypoint_id)
+        self.assertEquals("EGLM", p.dest_waypoint_id)
+        self.assertEquals("5130.02", p.dest_lat)
+        self.assertEquals("N", p.dest_lat_dir)
+        self.assertEquals("00046.34", p.dest_lon)
+        self.assertEquals("W", p.dest_lon_dir)
+        self.assertEquals("004.6", p.dest_range)
+        self.assertEquals("213.9", p.dest_true_bearing)
+        self.assertEquals("122.9", p.dest_velocity)
+        self.assertEquals("A", p.arrival_alarm)
+        self.assertEquals("3D", p.checksum)
+
+    def test_parses_map_3(self):
+        p = GPRMB()
+        p.parse("$GPRMB,A,x.x,a,c--c,d--d,llll.ll,e,yyyyy.yy,f,g.g,h.h,i.i,j*kk")
+
+        self.assertEquals("GPRMB", p.sen_type)
+        self.assertEquals("A", p.validity)
+        self.assertEquals("x.x", p.cross_track_error)
+        self.assertEquals("a", p.cte_correction_dir)
+        self.assertEquals("c--c", p.origin_waypoint_id)
+        self.assertEquals("d--d", p.dest_waypoint_id)
+        self.assertEquals("llll.ll", p.dest_lat)
+        self.assertEquals("e", p.dest_lat_dir)
+        self.assertEquals("yyyyy.yy", p.dest_lon)
+        self.assertEquals("f", p.dest_lon_dir)
+        self.assertEquals("g.g", p.dest_range)
+        self.assertEquals("h.h", p.dest_true_bearing)
+        self.assertEquals("i.i", p.dest_velocity)
+        self.assertEquals("j", p.arrival_alarm)
+        self.assertEquals("kk", p.checksum)
+
+    def test_checksum_passes(self):
+        p = GPRMB()
+        p.checksum = '20'
+        p.nmea_sentence = '$GPRMB,A,0.66,L,003,004,4917.24,N,12309.57,W,001.3,052.5,000.5,V*20'
+        result = p.check_chksum()
+        self.assertTrue(result)
+
+    def test_checksum_fails(self):
+        p = GPRMB()
+        p.checksum = '21'
+        p.nmea_sentence = '$GPRMB,A,0.66,L,003,004,4917.24,N,12309.57,W,001.3,052.5,000.5,V*21'
         result = p.check_chksum()
         self.assertFalse(result)
 
