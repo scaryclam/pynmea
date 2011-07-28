@@ -371,6 +371,25 @@ class GPRMB(NMEASentence):
         super(GPRMB, self).__init__(parse_map)
 
 
+class GPRMC(NMEASentence):
+    """ Recommended Minimum Specific GPS/TRANSIT Data
+    """
+    def __init__(self):
+        parse_map = (("Timestamp", "timestamp"),
+                     ("Data Validity", "data_validity"),
+                     ("Latitude", "lat"),
+                     ("Latitude Direction", "lat_dir"),
+                     ("Longitude", "lon"),
+                     ("Longitude Direction", "lon_dir"),
+                     ("Speed Over Ground", "spd_over_grnd"),
+                     ("True Course", "true_course"),
+                     ("Datestamp", "datestamp"),
+                     ("Magnetic Variation", "mag_variation"),
+                     ("Magnetic Variation Direction", "mag_var_dir"),
+                     ("Checksum", "checksum"))
+        super(GPRMC, self).__init__(parse_map)
+
+
 class GPRTE(NMEASentence):
     """ Routes
     """
@@ -603,13 +622,6 @@ class GPZDA(NMEASentence):
 #    def __init__(self):
 #        parse_map = ()
 #        super(GPOSD).__init__(parse_map)
-
-#class GPRMC(NMEASentence):
-#    """ Recommended Minimum Specific GPS/TRANSIT Data
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPRMC).__init__(parse_map)
 
 #class GPROT(NMEASentence):
 #    """ Rate of Turn

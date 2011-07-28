@@ -1,5 +1,5 @@
 import unittest
-from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA, GPRMB, GPRTE, GPR00, GPTRF
+from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA, GPRMB, GPRMC, GPRTE, GPR00, GPTRF
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -606,6 +606,82 @@ class TestGPRMB(unittest.TestCase):
         p = GPRMB()
         p.checksum = '21'
         p.nmea_sentence = '$GPRMB,A,0.66,L,003,004,4917.24,N,12309.57,W,001.3,052.5,000.5,V*21'
+        result = p.check_chksum()
+        self.assertFalse(result)
+
+
+class TestGPRMC(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map_1(self):
+        p = GPRMC()
+        p.parse("$GPRMC,081836,A,3751.65,S,14507.36,E,000.0,360.0,130998,011.3,E*62")
+
+        self.assertEquals("GPRMC", p.sen_type)
+        self.assertEquals("081836", p.timestamp)
+        self.assertEquals("A", p.data_validity)
+        self.assertEquals("3751.65", p.lat)
+        self.assertEquals("S", p.lat_dir)
+        self.assertEquals("14507.36", p.lon)
+        self.assertEquals("E", p.lon_dir)
+        self.assertEquals("000.0", p.spd_over_grnd)
+        self.assertEquals("360.0", p.true_course)
+        self.assertEquals("130998", p.datestamp)
+        self.assertEquals("011.3", p.mag_variation)
+        self.assertEquals("E", p.mag_var_dir)
+        self.assertEquals("62", p.checksum)
+
+    def test_parses_map_2(self):
+        p = GPRMC()
+        p.parse("$GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191194,020.3,E*68")
+
+        self.assertEquals("GPRMC", p.sen_type)
+        self.assertEquals("225446", p.timestamp)
+        self.assertEquals("A", p.data_validity)
+        self.assertEquals("4916.45", p.lat)
+        self.assertEquals("N", p.lat_dir)
+        self.assertEquals("12311.12", p.lon)
+        self.assertEquals("W", p.lon_dir)
+        self.assertEquals("000.5", p.spd_over_grnd)
+        self.assertEquals("054.7", p.true_course)
+        self.assertEquals("191194", p.datestamp)
+        self.assertEquals("020.3", p.mag_variation)
+        self.assertEquals("E", p.mag_var_dir)
+        self.assertEquals("68", p.checksum)
+
+    def test_parses_map_3(self):
+        p = GPRMC()
+        p.parse("$GPRMC,220516,A,5133.82,N,00042.24,W,173.8,231.8,130694,004.2,W*70")
+
+        self.assertEquals("GPRMC", p.sen_type)
+        self.assertEquals("220516", p.timestamp)
+        self.assertEquals("A", p.data_validity)
+        self.assertEquals("5133.82", p.lat)
+        self.assertEquals("N", p.lat_dir)
+        self.assertEquals("00042.24", p.lon)
+        self.assertEquals("W", p.lon_dir)
+        self.assertEquals("173.8", p.spd_over_grnd)
+        self.assertEquals("231.8", p.true_course)
+        self.assertEquals("130694", p.datestamp)
+        self.assertEquals("004.2", p.mag_variation)
+        self.assertEquals("W", p.mag_var_dir)
+        self.assertEquals("70", p.checksum)
+
+    def test_checksum_passes(self):
+        p = GPRMC()
+        p.checksum = '70'
+        p.nmea_sentence = '$GPRMC,220516,A,5133.82,N,00042.24,W,173.8,231.8,130694,004.2,W*70'
+        result = p.check_chksum()
+        self.assertTrue(result)
+
+    def test_checksum_fails(self):
+        p = GPRMC()
+        p.checksum = '71'
+        p.nmea_sentence = '$GPRMC,220516,A,5133.82,N,00042.24,W,173.8,231.8,130694,004.2,W*71'
         result = p.check_chksum()
         self.assertFalse(result)
 
