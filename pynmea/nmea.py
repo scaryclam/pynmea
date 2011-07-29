@@ -455,6 +455,21 @@ class GPTRF(NMEASentence):
         super(GPTRF, self).__init__(parse_map)
 
 
+class GPVBW(NMEASentence):
+    """ Dual Ground/Water Speed
+    """
+    def __init__(self):
+        parse_map = (
+            ("Longitudinal Water Speed", "lon_water_spd"), # Knots
+            ("Transverse Water Speed", "trans_water_spd"), # Knots
+            ("Water Speed Data Validity", "data_validity_water_spd"),
+            ("Longitudinal Ground Speed", "lon_grnd_spd"), # Knots
+            ("Transverse Ground Speed", "trans_grnd_spd"), # Knots
+            ("Ground Speed Data Validity", "data_validity_grnd_spd"),
+            ("Checksum", "checksum"))
+        super(GPVBW, self).__init__(parse_map)
+
+
 class GPZDA(NMEASentence):
     def __init__(self):
         parse_map = (
@@ -664,13 +679,6 @@ class GPZDA(NMEASentence):
 #    def __init__(self):
 #        parse_map = ()
 #        super(GPTTM).__init__(parse_map)
-
-#class GPVBW(NMEASentence):
-#    """ Dual Ground/Water Speed
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPVBW).__init__(parse_map)
 
 #class GPVDR(NMEASentence):
 #    """ Set and Drift

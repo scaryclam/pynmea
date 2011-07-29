@@ -785,6 +785,26 @@ class TestGPTRF(unittest.TestCase):
         self.assertEquals("ABC", p.sat_id)
 
 
+class TestGPVBW(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPVBW()
+        p.parse("$GPVBW,10.1,-0.2,A,9.8,-0.5,A*62")
+
+        self.assertEquals("GPVBW", p.)
+        self.assertEquals("10.1", p.lon_water_spd)
+        self.assertEquals("-0.2", p.trans_water_spd)
+        self.assertEquals("A", p.data_validity_water_spd)
+        self.assertEquals("9.8", p.lon_grnd_spd)
+        self.assertEquals("-0.5", p.trans_grnd_spd)
+        self.assertEquals("A", p.data_validity_grnd_spd)
+
+
 class TestGPZDA(unittest.TestCase):
     def setUp(self):
         pass
