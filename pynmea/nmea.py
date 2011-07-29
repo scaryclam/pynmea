@@ -1,3 +1,4 @@
+import re
 from pynmea.utils import checksum_calc
 
 class NMEASentence(object):
@@ -17,9 +18,16 @@ class NMEASentence(object):
         """
         self.nmea_sentence = nmea_str
         self.parts = nmea_str.split(',')
+
+        chksum_regex = re.compile(r".+((\*{1})(?i)(?P<chksum>[0-9a-f]{2}))$")
+        m = chksum_regex.match(nmea_str)
+
+        if m:
+            self.checksum = m.groupdict()['chksum']
+
         if '*' in self.parts[-1]:
             d, par, ck = self.parts.pop().rpartition('*')
-            self.parts.extend([d, ck])
+            self.parts.extend([d])
 
         self.sen_type = self.parts[0]
         if self.parts[0].startswith('$'):
@@ -99,8 +107,8 @@ class GPBWC(NMEASentence):
             ('Magnetic Symbol', 'mag_sym'),
             ('Range to waypoint', 'range_next'),
             ('Unit of range', 'range_unit'),
-            ('Waypoint Name', 'waypoint_name'),
-            ('Checksum', 'checksum'))
+            ('Waypoint Name', 'waypoint_name'))
+            #('Checksum', 'checksum'))
 
         super(GPBWC, self).__init__(parse_map)
 
@@ -119,8 +127,8 @@ class GPBWR(NMEASentence):
             ('Magnetic Symbol', 'mag_sym'),
             ('Range to waypoint', 'range_next'),
             ('Unit of range', 'range_unit'),
-            ('Waypoint Name', 'waypoint_name'),
-            ('Checksum', 'checksum'))
+            ('Waypoint Name', 'waypoint_name'))
+            #('Checksum', 'checksum'))
 
         super(GPBWR, self).__init__(parse_map)
 
@@ -141,8 +149,8 @@ class GPGGA(NMEASentence):
             ('Geoidal Separation', 'geo_sep'),
             ('Units of Geoidal Separation (meters)', 'geo_sep_units'),
             ('Age of Differential GPS Data (secs)', 'age_gps_data'),
-            ('Differential Reference Station ID', 'ref_station_id'),
-            ('Checksum', 'checksum'))
+            ('Differential Reference Station ID', 'ref_station_id'))
+            #('Checksum', 'checksum'))
 
         super(GPGGA, self).__init__(parse_map)
 
@@ -154,8 +162,8 @@ class GPGLL(NMEASentence):
             ('Latitude Direction', 'lat_dir'),
             ('Longitude', 'lon'),
             ('Longitude Direction', 'lon_dir'),
-            ('Timestamp', 'timestamp'),
-            ('Checksum', 'checksum'))
+            ('Timestamp', 'timestamp'))
+            #('Checksum', 'checksum'))
 
         super(GPGLL, self).__init__(parse_map)
         #self.check_chksum_calc = super(GPGLL, self).check_checksum
@@ -246,8 +254,8 @@ class GPGSA(NMEASentence):
             ('SV ID12', 'sv_id12'),
             ('PDOP (Dilution of precision)', 'pdop'),
             ('HDOP (Horizontal DOP)', 'hdop'),
-            ('VDOP (Vertical DOP)', 'vdop'),
-            ('Checksum', 'checksum'))
+            ('VDOP (Vertical DOP)', 'vdop'))
+            #('Checksum', 'checksum'))
 
         super(GPGSA, self).__init__(parse_map)
 
@@ -273,8 +281,8 @@ class GPGSV(NMEASentence):
             ('SV PRN number 4', 'sv_prn_num_4'),
             ('Elevation in degrees 4', 'elevation_deg_4'), # 90 max
             ('Azimuth, deg from true north 4', 'azimuth_4'), # 000 to 159
-            ('SNR 4', 'snr_4'),  # 00-99 dB
-            ('Checksum', 'checksum'))
+            ('SNR 4', 'snr_4'))  # 00-99 dB
+            #('Checksum', 'checksum'))
 
         super(GPGSV, self).__init__(parse_map)
 
@@ -289,8 +297,8 @@ class GPHDG(NMEASentence):
             ("Deviation", "deviation"),
             ("Deviation Direction", "dev_dir"),
             ("Variation", "variation"),
-            ("Variation Direction", "var_dir"),
-            ("Checksum", "checksum"))
+            ("Variation Direction", "var_dir"))
+            #("Checksum", "checksum"))
 
         super(GPHDG, self).__init__(parse_map)
 
@@ -299,8 +307,8 @@ class GPHDT(NMEASentence):
     def __init__(self):
         parse_map = (
             ("Heading", "heading"),
-            ("True", "hdg_true"),
-            ("Checksum", "checksum"))
+            ("True", "hdg_true"))
+            #("Checksum", "checksum"))
 
         super(GPHDT, self).__init__(parse_map)
 
@@ -308,8 +316,8 @@ class GPHDT(NMEASentence):
 class GPR00(NMEASentence):
     def __init__(self):
         parse_map = (
-            ("Waypoint List", "waypoint_list"),
-            ("Checksum", "checksum"))
+            ("Waypoint List", "waypoint_list"))
+            #("Checksum", "checksum"))
 
         super(GPR00, self).__init__(parse_map)
 
@@ -343,8 +351,8 @@ class GPRMA(NMEASentence):
             ("Speed over ground", "spd_over_grnd"), # Knots
             ("Course over ground", "crse_over_grnd"),
             ("Variation", "variation"),
-            ("Variation Direction", "var_dir"),
-            ("Checksum", "checksum"))
+            ("Variation Direction", "var_dir"))
+            #("Checksum", "checksum"))
 
         super(GPRMA, self).__init__(parse_map)
 
@@ -366,8 +374,8 @@ class GPRMB(NMEASentence):
             ("Range to Destination", "dest_range"), # Nautical Miles
             ("True Bearing to Destination", "dest_true_bearing"),
             ("Velocity Towards Destination", "dest_velocity"), # Knots
-            ("Arrival Alarm", "arrival_alarm"), # A = Arrived, V = Not arrived
-            ("Checksum", "checksum"))
+            ("Arrival Alarm", "arrival_alarm")) # A = Arrived, V = Not arrived
+            #("Checksum", "checksum"))
         super(GPRMB, self).__init__(parse_map)
 
 
@@ -385,8 +393,8 @@ class GPRMC(NMEASentence):
                      ("True Course", "true_course"),
                      ("Datestamp", "datestamp"),
                      ("Magnetic Variation", "mag_variation"),
-                     ("Magnetic Variation Direction", "mag_var_dir"),
-                     ("Checksum", "checksum"))
+                     ("Magnetic Variation Direction", "mag_var_dir"))
+                     #("Checksum", "checksum"))
         super(GPRMC, self).__init__(parse_map)
 
 
@@ -399,8 +407,8 @@ class GPRTE(NMEASentence):
             ("Sentence Number", "sen_num"),
             ("Start Type", "start_type"), # The first in the list is either current route or waypoint
             ("Name or Number of Active Route", "active_route_id"),
-            ("Waypoint List", "waypoint_list"),
-            ("Checksum", "checksum"))
+            ("Waypoint List", "waypoint_list"))
+            #("Checksum", "checksum"))
 
         super(GPRTE, self).__init__(parse_map)
 
@@ -428,8 +436,8 @@ class GPSTN(NMEASentence):
     """
     def __init__(self):
         parse_map = (
-            ("Talker ID Number", "talker_id"), # 00 - 99
-            ("Checksum", "checksum"))
+            ("Talker ID Number", "talker_id")) # 00 - 99
+            #("Checksum", "checksum"))
 
 
         super(GPSTN, self).__init__(parse_map)
@@ -465,8 +473,8 @@ class GPVBW(NMEASentence):
             ("Water Speed Data Validity", "data_validity_water_spd"),
             ("Longitudinal Ground Speed", "lon_grnd_spd"), # Knots
             ("Transverse Ground Speed", "trans_grnd_spd"), # Knots
-            ("Ground Speed Data Validity", "data_validity_grnd_spd"),
-            ("Checksum", "checksum"))
+            ("Ground Speed Data Validity", "data_validity_grnd_spd"))
+            #("Checksum", "checksum"))
         super(GPVBW, self).__init__(parse_map)
 
 
@@ -478,8 +486,8 @@ class GPZDA(NMEASentence):
         ("Month", "month"), # 01 to 12
         ("Year", "year"), # Year = YYYY
         ("Local Zone Description", "local_zone"), # 00 to +/- 13 hours
-        ("Local Zone Minutes Description", "local_zone_minutes"), # same sign as hours
-        ("Checksum", "checksum"))
+        ("Local Zone Minutes Description", "local_zone_minutes")) # same sign as hours
+        #("Checksum", "checksum"))
 
         super(GPZDA, self).__init__(parse_map)
 

@@ -1,5 +1,5 @@
 import unittest
-from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA, GPRMB, GPRMC, GPRTE, GPR00, GPTRF
+from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA, GPRMB, GPRMC, GPRTE, GPR00, GPTRF, GPVBW
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -796,7 +796,7 @@ class TestGPVBW(unittest.TestCase):
         p = GPVBW()
         p.parse("$GPVBW,10.1,-0.2,A,9.8,-0.5,A*62")
 
-        self.assertEquals("GPVBW", p.)
+        self.assertEquals("GPVBW", p.sen_type)
         self.assertEquals("10.1", p.lon_water_spd)
         self.assertEquals("-0.2", p.trans_water_spd)
         self.assertEquals("A", p.data_validity_water_spd)
