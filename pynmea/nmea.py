@@ -478,6 +478,23 @@ class GPVBW(NMEASentence):
         super(GPVBW, self).__init__(parse_map)
 
 
+class GPVTG(NMEASentence):
+    """ Track Made Good and Ground Speed
+    """
+    def __init__(self):
+        parse_map = (
+            ("True Track made good", "true_track"),
+            ("True Track made good symbol", "true_track_sym"),
+            ("Magnetic Track made good", "mag_track"),
+            ("Magnetic Track symbol", "mag_track_sym"),
+            ("Speed over ground knots", "spd_over_grnd_kts"),
+            ("Speed over ground symbol", "spd_over_grnd_kts_sym"),
+            ("Speed over ground kmph", "spd_over_grnd_kmph"),
+            ("Speed over ground kmph symbol", "spd_over_grnd_kmph_sym"))
+
+        super(GPVTG, self).__init__(parse_map)
+
+
 class GPZDA(NMEASentence):
     def __init__(self):
         parse_map = (
@@ -716,12 +733,7 @@ class GPZDA(NMEASentence):
 #        parse_map = ()
 #        super(GPVPW).__init__(parse_map)
 
-#class GPVTG(NMEASentence):
-#    """ Track Made Good and Ground Speed
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPVTG).__init__(parse_map)
+
 
 #class GPWCV(NMEASentence):
 #    """ Waypoint Closure Velocity

@@ -1,5 +1,7 @@
 import unittest
-from pynmea.nmea import NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA, GPRMB, GPRMC, GPRTE, GPR00, GPTRF, GPVBW
+from pynmea.nmea import (NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA,
+                         GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA,
+                         GPRMB, GPRMC, GPRTE, GPR00, GPTRF, GPVBW, GPVTG)
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -803,6 +805,62 @@ class TestGPVBW(unittest.TestCase):
         self.assertEquals("9.8", p.lon_grnd_spd)
         self.assertEquals("-0.5", p.trans_grnd_spd)
         self.assertEquals("A", p.data_validity_grnd_spd)
+
+
+class TestGPVTG(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map_1(self):
+        p = GPVTG()
+        p.parse("$GPVTG,360.0,T,348.7,M,000.0,N,000.0,K*43")
+
+        self.assertEquals("GPVTG", p.sen_type)
+        self.assertEquals("360.0", p.true_track)
+        self.assertEquals("T", p.true_track_sym)
+        self.assertEquals("348.7", p.mag_track)
+        self.assertEquals("M", p.mag_track_sym)
+        self.assertEquals("000.0", p.spd_over_grnd_kts)
+        self.assertEquals("N", p.spd_over_grnd_kts_sym)
+        self.assertEquals("000.0", p.spd_over_grnd_kmph)
+        self.assertEquals("K", p.spd_over_grnd_kmph_sym)
+        self.assertEquals('43', p.checksum)
+
+    def test_parses_map_2(self):
+        p = GPVTG()
+        p.parse("GPVTG,054.7,T,034.4,M,005.5,N,010.2,K")
+
+        self.assertEquals("GPVTG", p.sen_type)
+        self.assertEquals("054.7", p.true_track)
+        self.assertEquals("T", p.true_track_sym)
+        self.assertEquals("034.4", p.mag_track)
+        self.assertEquals("M", p.mag_track_sym)
+        self.assertEquals("005.5", p.spd_over_grnd_kts)
+        self.assertEquals("N", p.spd_over_grnd_kts_sym)
+        self.assertEquals("010.2", p.spd_over_grnd_kmph)
+        self.assertEquals("K", p.spd_over_grnd_kmph_sym)
+        self.assertFalse(hasattr(p, 'checksum'))
+
+    def test_parses_map3(self):
+        p = GPVTG()
+        p.parse("$GPVTG,t,T,,,s.ss,N,s.ss,K*hh")
+
+        self.assertEquals("GPVTG", p.sen_type)
+        self.assertEquals("t", p.true_track)
+        self.assertEquals("T", p.true_track_sym)
+        self.assertEquals("", p.mag_track)
+        self.assertEquals("", p.mag_track_sym)
+        self.assertEquals("s.ss", p.spd_over_grnd_kts)
+        self.assertEquals("N", p.spd_over_grnd_kts_sym)
+        self.assertEquals("s.ss", p.spd_over_grnd_kmph)
+        self.assertEquals("K", p.spd_over_grnd_kmph_sym)
+
+        # Despite a checksum being listed in the sentence, there should NOT be
+        # on on the object as 'hh' is not a valid hex pair
+        self.assertFalse(hasattr(p, 'checksum'))
 
 
 class TestGPZDA(unittest.TestCase):
