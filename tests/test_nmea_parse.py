@@ -1,7 +1,8 @@
 import unittest
 from pynmea.nmea import (NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA,
                          GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA,
-                         GPRMB, GPRMC, GPRTE, GPR00, GPTRF, GPVBW, GPVTG)
+                         GPRMB, GPRMC, GPRTE, GPR00, GPTRF, GPVBW, GPVTG,
+                         GPWCV)
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -15,29 +16,27 @@ class TestNMEAParse(unittest.TestCase):
         parse_map = (("Latitude", "lat"),
                      ("Direction", "lat_dir"),
                      ("Longitude", "lon"),
-                     ("Direction", "lon_dir"),
-                     ("Checksum", "checksum"))
+                     ("Direction", "lon_dir"))
 
         p = NMEASentence(parse_map)
         p._parse("$GPGLL,3751.65,S,14507.36,E*77")
 
         self.assertEquals("GPGLL", p.sen_type)
         self.assertEquals(p.parts,
-                          ['GPGLL', '3751.65', 'S', '14507.36', 'E', '77'])
+                          ['GPGLL', '3751.65', 'S', '14507.36', 'E'])
 
     def test_parse(self):
         parse_map = (("Latitude", "lat"),
                      ("Direction", "lat_dir"),
                      ("Longitude", "lon"),
-                     ("Direction", "lon_dir"),
-                     ("Checksum", "checksum"))
+                     ("Direction", "lon_dir"))
 
         p = NMEASentence(parse_map)
         p.parse("$GPGLL,3751.65,S,14507.36,E*77")
 
         self.assertEquals("GPGLL", p.sen_type)
         self.assertEquals(p.parts,
-                          ['GPGLL', '3751.65', 'S', '14507.36', 'E', '77'])
+                          ['GPGLL', '3751.65', 'S', '14507.36', 'E'])
         self.assertEquals(p.lat, '3751.65')
         self.assertEquals(p.lat_dir, 'S')
         self.assertEquals(p.lon, '14507.36')
@@ -210,7 +209,7 @@ class TestGPGLL(unittest.TestCase):
         self.assertEquals("S", p.lat_dir)
         self.assertEquals("14507.36", p.lon)
         self.assertEquals("E", p.lon_dir)
-        self.assertEquals("", p.timestamp)
+        #self.assertEquals("", p.timestamp) # No timestamp given
         self.assertEquals("77", p.checksum)
 
     def test_parses_map2(self):
@@ -223,25 +222,25 @@ class TestGPGLL(unittest.TestCase):
         self.assertEquals("12311.12", p.lon)
         self.assertEquals("W", p.lon_dir)
         self.assertEquals("225444", p.timestamp)
-        self.assertEquals("A", p.checksum)
+        self.assertEquals("A", p.data_valid)
 
-    def test_checksum_passes1(self):
-        p = GPGLL()
-        p.nmea_sentence = "$GPGLL,4916.45,N,12311.12,W,225444,A"
-        p.checksum = 'A'
-        p._use_data_validity = True
+    #def test_checksum_passes1(self):
+        #p = GPGLL()
+        #p.nmea_sentence = "$GPGLL,4916.45,N,12311.12,W,225444,A"
+        #p.data_validity = 'A'
+        ##p._use_data_validity = True
 
-        result = p.check_chksum()
-        self.assertTrue(result)
+        #result = p.check_chksum()
+        #self.assertTrue(result)
 
-    def test_checksum_fails1(self):
-        p = GPGLL()
-        p.nmea_sentence = "$GPGLL,4916.45,N,12311.12,W,225444,B"
-        p.checksum = 'B'
-        p._use_data_validity = True
+    #def test_checksum_fails1(self):
+        #p = GPGLL()
+        #p.nmea_sentence = "$GPGLL,4916.45,N,12311.12,W,225444,B"
+        #p.checksum = 'B'
+        #p._use_data_validity = True
 
-        result = p.check_chksum()
-        self.assertFalse(result)
+        #result = p.check_chksum()
+        #self.assertFalse(result)
 
     def test_checksum_passes2(self):
         p = GPGLL()
@@ -594,8 +593,13 @@ class TestGPRMB(unittest.TestCase):
         self.assertEquals("g.g", p.dest_range)
         self.assertEquals("h.h", p.dest_true_bearing)
         self.assertEquals("i.i", p.dest_velocity)
-        self.assertEquals("j", p.arrival_alarm)
-        self.assertEquals("kk", p.checksum)
+
+        # This should include the bogus checksum as the checksum is not a valid
+        # hex pair and should not be stripped off
+        self.assertEquals("j*kk", p.arrival_alarm)
+
+        # There should be no checksum as it was not a valid hex pair
+        self.assertFalse(hasattr(p, 'checksum'))
 
     def test_checksum_passes(self):
         p = GPRMB()
@@ -856,7 +860,10 @@ class TestGPVTG(unittest.TestCase):
         self.assertEquals("s.ss", p.spd_over_grnd_kts)
         self.assertEquals("N", p.spd_over_grnd_kts_sym)
         self.assertEquals("s.ss", p.spd_over_grnd_kmph)
-        self.assertEquals("K", p.spd_over_grnd_kmph_sym)
+
+        # The checksum did not get stripped off as it is invalid
+        # (not a hex pair).
+        self.assertEquals("K*hh", p.spd_over_grnd_kmph_sym)
 
         # Despite a checksum being listed in the sentence, there should NOT be
         # on on the object as 'hh' is not a valid hex pair
@@ -896,6 +903,41 @@ class TestGPZDA(unittest.TestCase):
         p = GPZDA()
         p.checksum = 'b5'
         p.nmea_sentence = '$GPZDA,025959.000,01,01,1970,,*b5'
+
+        result = p.check_chksum()
+
+        self.assertFalse(result)
+
+
+class TestGPWCV(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPWCV()
+        p.parse("$GPWCV,2.3,N,ABCD*1C")
+
+        self.assertEquals("GPWCV", p.sen_type)
+        self.assertEquals("2.3", p.velocity)
+        self.assertEquals("N", p.vel_units)
+        self.assertEquals("ABCD", p.waypoint_id)
+
+    def test_checksum_passes(self):
+        p = GPWCV()
+        p.checksum = '1C'
+        p.nmea_sentence = '$GPWCV,2.3,N,ABCD*1C'
+
+        result = p.check_chksum()
+
+        self.assertTrue(result)
+
+    def test_checksum_fails(self):
+        p = GPWCV()
+        p.checksum = '1B'
+        p.nmea_sentence = '$GPWCV,2.3,N,ABCD*1B'
 
         result = p.check_chksum()
 

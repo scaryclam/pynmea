@@ -24,10 +24,12 @@ class NMEASentence(object):
 
         if m:
             self.checksum = m.groupdict()['chksum']
-
-        if '*' in self.parts[-1]:
             d, par, ck = self.parts.pop().rpartition('*')
             self.parts.extend([d])
+
+        #if '*' in self.parts[-1]:
+            #d, par, ck = self.parts.pop().rpartition('*')
+            #self.parts.extend([d])
 
         self.sen_type = self.parts[0]
         if self.parts[0].startswith('$'):
@@ -162,59 +164,66 @@ class GPGLL(NMEASentence):
             ('Latitude Direction', 'lat_dir'),
             ('Longitude', 'lon'),
             ('Longitude Direction', 'lon_dir'),
-            ('Timestamp', 'timestamp'))
+            ('Timestamp', 'timestamp'),
+            ('Data Validity', "data_valid"))
             #('Checksum', 'checksum'))
 
         super(GPGLL, self).__init__(parse_map)
-        #self.check_chksum_calc = super(GPGLL, self).check_checksum
 
         self._use_data_validity = False
         float
 
-    def _parse(self, nmea_str):
-        """ GPGGL Allows for a couple of different formats.
-            The all have lat,direction,lon,direction
+    #def _parse(self, nmea_str):
+        #""" GPGGL Allows for a couple of different formats.
+            #The all have lat,direction,lon,direction
 
-            but one may have timestamp,data_validity
-            while the other has only checksum
+            #but one may have timestamp,data_validity
+            #while the other has only checksum
 
-            We shall treat data_validity as a checksum and always
-            add in a timestamp field
+            #We shall treat data_validity as a checksum and always
+            #add in a timestamp field
 
-        """
-        self.nmea_sentence = nmea_str
-        self.parts = nmea_str.split(',')
+        #"""
+        #self.nmea_sentence = nmea_str
+        #self.parts = nmea_str.split(',')
 
-        if '*' in self.parts[-1]:
-            # There is a checksum but no timestamp + data_validity.
-            # Add an empty field for the timestamp and indicate that when
-            # validating the checksum, we should use validity, not a
-            # calculation
-            d, par, ck = self.parts.pop().rpartition('*')
-            self.parts.extend([d, '', ck])
-            self._use_data_validity = True
+        #chksum_regex = re.compile(r".+((\*{1})(?i)(?P<chksum>[0-9a-f]{2}))$")
+        #m = chksum_regex.match(nmea_str)
 
-        self.sen_type = self.parts[0]
-        if self.parts[0].startswith('$'):
-            self.parts[0] = self.parts[0][1:]
-        self.sen_type = self.parts[0]
+        #if m:
+            #self.checksum = m.groupdict()['chksum']
 
-    def check_chksum(self):
-        """ Override check_checksum. If it has been detected that
-            the checksum field contains "A" for valid data and something else
-            for invalid, do a check based on thsi information. Otherwise, call
-            to original checksum code from the superclass
-        """
-        # If we are looking for an "A" character
-        if self._use_data_validity:
-            if self.checksum == 'A':
-                return True
-            else:
-                return False
 
-        else:
-            # Otherwise, call the superclass version
-            return super(GPGLL, self).check_chksum()
+        ##if '*' in self.parts[-1]:
+            ### There is a checksum but no timestamp + data_validity.
+            ### Add an empty field for the timestamp and indicate that when
+            ### validating the checksum, we should use validity, not a
+            ### calculation
+            ##d, par, ck = self.parts.pop().rpartition('*')
+            ##self.parts.extend([d, ''])
+            ##self._use_data_validity = True
+
+        #self.sen_type = self.parts[0]
+        #if self.parts[0].startswith('$'):
+            #self.parts[0] = self.parts[0][1:]
+        #self.sen_type = self.parts[0]
+
+    #def check_chksum(self):
+        #""" Override check_checksum. If it has been detected that
+            #the checksum field contains "A" for valid data and something else
+            #for invalid, do a check based on thsi information. Otherwise, call
+            #to original checksum code from the superclass
+        #"""
+        ## If we are looking for an "A" character
+        #if self._use_data_validity:
+            #if self.checksum == 'A':
+                #return True
+            #else:
+                #return False
+
+        #else:
+            ## Otherwise, call the superclass version
+            #return super(GPGLL, self).check_chksum()
 
     @property
     def latitude(self):
@@ -316,7 +325,7 @@ class GPHDT(NMEASentence):
 class GPR00(NMEASentence):
     def __init__(self):
         parse_map = (
-            ("Waypoint List", "waypoint_list"))
+            ("Waypoint List", "waypoint_list"),)
             #("Checksum", "checksum"))
 
         super(GPR00, self).__init__(parse_map)
@@ -329,8 +338,8 @@ class GPR00(NMEASentence):
         self._parse(nmea_str)
 
         new_parts = [self.parts[0]]
-        new_parts.append(self.parts[1:-1])
-        new_parts.append(self.parts[-1])
+        new_parts.append(self.parts[1:])
+        #new_parts.append(self.parts[-1])
 
         self.parts = new_parts
 
@@ -421,8 +430,7 @@ class GPRTE(NMEASentence):
 
         new_parts = []
         new_parts.extend(self.parts[0:5])
-        new_parts.append(self.parts[5:-1])
-        new_parts.append(self.parts[-1])
+        new_parts.append(self.parts[5:])
 
         self.parts = new_parts
 
@@ -436,7 +444,7 @@ class GPSTN(NMEASentence):
     """
     def __init__(self):
         parse_map = (
-            ("Talker ID Number", "talker_id")) # 00 - 99
+            ("Talker ID Number", "talker_id"),) # 00 - 99
             #("Checksum", "checksum"))
 
 
@@ -495,15 +503,27 @@ class GPVTG(NMEASentence):
         super(GPVTG, self).__init__(parse_map)
 
 
+class GPWCV(NMEASentence):
+    """ Waypoint Closure Velocity
+    """
+    def __init__(self):
+        parse_map = (
+            ("Velocity", "velocity"),
+            ("Velocity Units", "vel_units"), # Knots
+            ("Waypoint ID", "waypoint_id"))
+
+        super(GPWCV, self).__init__(parse_map)
+
+
 class GPZDA(NMEASentence):
     def __init__(self):
         parse_map = (
-        ("Timestamp", "timestamp"), # hhmmss.ss = UTC
-        ("Day", "day"), # 01 to 31
-        ("Month", "month"), # 01 to 12
-        ("Year", "year"), # Year = YYYY
-        ("Local Zone Description", "local_zone"), # 00 to +/- 13 hours
-        ("Local Zone Minutes Description", "local_zone_minutes")) # same sign as hours
+            ("Timestamp", "timestamp"), # hhmmss.ss = UTC
+            ("Day", "day"), # 01 to 31
+            ("Month", "month"), # 01 to 12
+            ("Year", "year"), # Year = YYYY
+            ("Local Zone Description", "local_zone"), # 00 to +/- 13 hours
+            ("Local Zone Minutes Description", "local_zone_minutes")) # same sign as hours
         #("Checksum", "checksum"))
 
         super(GPZDA, self).__init__(parse_map)
@@ -732,15 +752,6 @@ class GPZDA(NMEASentence):
 #    def __init__(self):
 #        parse_map = ()
 #        super(GPVPW).__init__(parse_map)
-
-
-
-#class GPWCV(NMEASentence):
-#    """ Waypoint Closure Velocity
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPWCV).__init__(parse_map)
 
 #class GPWNC(NMEASentence):
 #    """ Distance, Waypoint to Waypoint
