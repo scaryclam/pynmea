@@ -566,7 +566,6 @@ class GPZDA(NMEASentence):
 #        parse_map = ()
 #        super(GPAAM).__init__()
 
-
 #class GPALM(NMEASentence):
 #    """
 #    """
