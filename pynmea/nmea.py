@@ -528,14 +528,14 @@ class GPWCV(NMEASentence):
         super(GPWCV, self).__init__(parse_map)
 
 
-<<<<<<< HEAD
 class GPWNC(NMEASentence):
     """ Distance, Waypoint to Waypoint
     """
     def __init__(self):
         parse_map = ()
         super(GPWNC, self).__init__(parse_map)
-=======
+
+
 class GPWPL(NMEASentence):
     """ Waypoint Location
     """
@@ -561,7 +561,6 @@ class GPXTE(NMEASentence):
                      ("Distance Units", "dist_units"))
 
         super(GPXTE, self).__init__(parse_map)
->>>>>>> 195bdcb8f063745a26abcb9e654e979b09d18ac8
 
 
 class GPZDA(NMEASentence):
