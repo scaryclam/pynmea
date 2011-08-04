@@ -1,8 +1,8 @@
 import unittest
-from pynmea.nmea import (NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA,
-                         GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA,
-                         GPRMB, GPRMC, GPRTE, GPR00, GPTRF, GPVBW, GPVTG,
-                         GPWCV)
+from pynmea.nmea import (NMEASentence, GPAAM, GPGLL, GPBOD, GPBWC, GPBWR,
+                         GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN,
+                         GPRMA, GPRMB, GPRMC, GPRTE, GPR00, GPTRF, GPVBW,
+                         GPVTG, GPWCV, GPWPL, GPXTE)
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -72,6 +72,27 @@ class TestNMEAParse(unittest.TestCase):
         result = p.check_chksum()
 
         self.assertFalse(result)
+
+
+class TestGPAAM(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPAAM()
+        p.parse("$GPAAM,A,A,0.10,N,WPTNME*32")
+
+        self.assertEquals("GPAAM", p.sen_type)
+        self.assertEquals("A", p.arrival_circ_entered)
+        self.assertEquals("A", p.perp_passed)
+        self.assertEquals("0.10", p.circle_rad)
+        self.assertEquals("N", p.circle_rad_unit)
+        self.assertEquals("WPTNME", p.waypoint_id)
+        self.assertEquals("32", p.checksum)
+
 
 class TestGPBOD(unittest.TestCase):
     def setUp(self):
@@ -942,6 +963,69 @@ class TestGPWCV(unittest.TestCase):
         result = p.check_chksum()
 
         self.assertFalse(result)
+
+
+class TestGPWPL(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map_1(self):
+        p = GPWPL()
+        p.parse("$GPWPL,4917.16,N,12310.64,W,003*65")
+
+        self.assertEquals("GPWPL", p.sen_type)
+        self.assertEquals("4917.16", p.lat)
+        self.assertEquals("N", p.lat_dir)
+        self.assertEquals("12310.64", p.lon)
+        self.assertEquals("W", p.lon_dir)
+        self.assertEquals("003", p.waypoint_id)
+        self.assertEquals("65", p.checksum)
+
+    def test_parses_map_2(self):
+        p = GPWPL()
+        p.parse("$GPWPL,5128.62,N,00027.58,W,EGLL*59")
+
+        self.assertEquals("GPWPL", p.sen_type)
+        self.assertEquals("5128.62", p.lat)
+        self.assertEquals("N", p.lat_dir)
+        self.assertEquals("00027.58", p.lon)
+        self.assertEquals("W", p.lon_dir)
+        self.assertEquals("EGLL", p.waypoint_id)
+        self.assertEquals("59", p.checksum)
+
+
+class TestGPXTE(unittest.TestCase):
+    def setUp(Self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map_1(self):
+        p = GPXTE()
+        p.parse("$GPXTE,A,A,0.67,L,N")
+
+        self.assertEquals("GPXTE", p.sen_type)
+        self.assertEquals("A", p.warning_flag)
+        self.assertEquals("A", p.lock_flag)
+        self.assertEquals("0.67", p.cross_track_err_dist)
+        self.assertEquals("L", p.correction_dir)
+        self.assertEquals("N", p.dist_units)
+
+    def test_parses_map_2(self):
+        p = GPXTE()
+        p.parse("$GPXTE,A,A,4.07,L,N*6D")
+
+        self.assertEquals("GPXTE", p.sen_type)
+        self.assertEquals("A", p.warning_flag)
+        self.assertEquals("A", p.lock_flag)
+        self.assertEquals("4.07", p.cross_track_err_dist)
+        self.assertEquals("L", p.correction_dir)
+        self.assertEquals("N", p.dist_units)
+        self.assertEquals("6D", p.checksum)
 
 
 class TestUtils(unittest.TestCase):

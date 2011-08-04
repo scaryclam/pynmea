@@ -65,6 +65,19 @@ class NMEASentence(object):
 # supported. They are being added as properties and other useful functions are
 # implimented. Unit tests are also provided.
 # ---------------------------------------------------------------------------- #
+class GPAAM(NMEASentence):
+    """ Waypoint Arrival Alarm
+    """
+    def __init__(self):
+        parse_map = (
+            ("Arrival Circle Entered", "arrival_circ_entered"),
+            ("Perpendicular Passed", "perp_passed"),
+            ("Circle Radius", "circle_rad"),
+            ("Nautical Miles", "circle_rad_unit"),
+            ("Waypoint ID", "waypoint_id"))
+
+        super(GPAAM, self).__init__(parse_map)
+
 
 class GPBOD(NMEASentence):
     def __init__(self):
@@ -515,12 +528,40 @@ class GPWCV(NMEASentence):
         super(GPWCV, self).__init__(parse_map)
 
 
+<<<<<<< HEAD
 class GPWNC(NMEASentence):
     """ Distance, Waypoint to Waypoint
     """
     def __init__(self):
         parse_map = ()
         super(GPWNC, self).__init__(parse_map)
+=======
+class GPWPL(NMEASentence):
+    """ Waypoint Location
+    """
+    def __init__(self):
+        parse_map = (
+            ("Latitude", "lat"),
+            ("Latitude Direction", "lat_dir"),
+            ("Longitude", "lon"),
+            ("Longitude Direction", "lon_dir"),
+            ("Waypoint ID", "waypoint_id"))
+
+        super(GPWPL, self).__init__(parse_map)
+
+
+class GPXTE(NMEASentence):
+    """ Cross-Track Error, Measured
+    """
+    def __init__(self):
+        parse_map = (("General Warning Flag", "warning_flag"),
+                     ("Lock flag (Not Used)", "lock_flag"),
+                     ("Cross Track Error Distance", "cross_track_err_dist"),
+                     ("Correction Direction (L or R)", "correction_dir"),
+                     ("Distance Units", "dist_units"))
+
+        super(GPXTE, self).__init__(parse_map)
+>>>>>>> 195bdcb8f063745a26abcb9e654e979b09d18ac8
 
 
 class GPZDA(NMEASentence):
@@ -539,14 +580,6 @@ class GPZDA(NMEASentence):
 
 # ---------------------------------- Not Yet Implimented --------------------- #
 # ---------------------------------------------------------------------------- #
-
-#class GPAAM(NMEASentence):
-#    """
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPAAM).__init__()
-
 
 #class GPALM(NMEASentence):
 #    """
@@ -763,26 +796,12 @@ class GPZDA(NMEASentence):
 
 
 
-#class GPWPL(NMEASentence):
-#    """ Waypoint Location
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPWPL).__init__(parse_map)
-
 #class GPXDR(NMEASentence):
 #    """ Transducer Measurements
 #    """
 #    def __init__(self):
 #        parse_map = ()
 #        super(GPXDR).__init__(parse_map)
-
-#class GPXTE(NMEASentence):
-#    """ Cross-Track Error, Measured
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPXTE).__init__(parse_map)
 
 #class GPXTR(NMEASentence):
 #    """ Cross-Track Error, Dead Reckoning
