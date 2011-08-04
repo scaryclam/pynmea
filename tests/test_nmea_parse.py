@@ -1,8 +1,8 @@
 import unittest
-from pynmea.nmea import (NMEASentence, GPAAM, GPGLL, GPBOD, GPBWC, GPBWR,
-                         GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN,
-                         GPRMA, GPRMB, GPRMC, GPRTE, GPR00, GPTRF, GPVBW,
-                         GPVTG, GPWCV, GPWPL, GPXTE)
+from pynmea.nmea import (NMEASentence, GPAAM, GPALM, GPAPA, GPAPB, GPGLL, GPBOD,
+                         GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA,
+                         GPSTN, GPRMA, GPRMB, GPRMC, GPRTE, GPR00, GPTRF, GPVBW,
+                         GPVTG, GPWCV, GPWNC, GPWPL, GPXTE)
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -92,6 +92,90 @@ class TestGPAAM(unittest.TestCase):
         self.assertEquals("N", p.circle_rad_unit)
         self.assertEquals("WPTNME", p.waypoint_id)
         self.assertEquals("32", p.checksum)
+
+
+class TestGPALM(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPALM()
+        p.parse("$GPALM,32,1,01,5,00,264A,4E,0A5E,FD3F,A11257,B8E036,536C67,2532C1,069,000*7B")
+
+        self.assertEquals("GPALM", p.sen_type)
+        self.assertEquals("32", p.total_num_msgs)
+        self.assertEquals("1", p.msg_num)
+        self.assertEquals("01", p.sat_prn_num)
+        self.assertEquals("5", p.gps_week_num)
+        self.assertEquals("00", p.sv_health)
+        self.assertEquals("264A", p.eccentricity)
+        self.assertEquals("4E", p.alamanac_ref_time)
+        self.assertEquals("0A5E", p.inc_angle)
+        self.assertEquals("FD3F", p.rate_right_asc)
+        self.assertEquals("A11257", p.root_semi_major_axis)
+        self.assertEquals("B8E036", p.arg_perigee)
+        self.assertEquals("536C67", p.lat_asc_node)
+        self.assertEquals("2532C1", p.mean_anom)
+        self.assertEquals("069", p.f0_clock_param)
+        self.assertEquals("000", p.f1_clock_param)
+        self.assertEquals("7B", p.checksum)
+
+
+class TestGPAPA(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPAPA()
+        p.parse("$GPAPA,A,A,0.10,R,N,V,V,011,M,DEST*82")
+
+        self.assertEquals("GPAPA", p.sen_type)
+        self.assertEquals("A", p.status_gen)
+        self.assertEquals("A", p.status_cycle_lock)
+        self.assertEquals("0.10", p.cross_track_err_mag)
+        self.assertEquals("R", p.dir_steer)
+        self.assertEquals("N", p.cross_track_unit)
+        self.assertEquals("V", p.arr_circle_entered)
+        self.assertEquals("V", p.perp_passed)
+        self.assertEquals("011", p.bearing_to_dest)
+        self.assertEquals("M", p.bearing_type)
+        self.assertEquals("DEST", p.dest_waypoint_id)
+        self.assertEquals("82", p.checksum)
+
+
+class TestGPAPB(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPAPB()
+        p.parse("$GPAPB,A,A,0.10,R,N,V,V,011,M,DEST,011,M,011,M*82")
+
+        self.assertEquals("GPAPB", p.sen_type)
+        self.assertEquals("A", p.status_gen)
+        self.assertEquals("A", p.status_cycle_lock)
+        self.assertEquals("0.10", p.cross_track_err_mag)
+        self.assertEquals("R", p.dir_steer)
+        self.assertEquals("N", p.cross_track_unit)
+        self.assertEquals("V", p.arr_circle_entered)
+        self.assertEquals("V", p.perp_passed)
+        self.assertEquals("011", p.bearing_to_dest)
+        self.assertEquals("M", p.bearing_type)
+        self.assertEquals("DEST", p.dest_waypoint_id)
+        self.assertEquals("011", p.bearing_pres_dest)
+        self.assertEquals("M", p.bearing_pres_dest_type)
+        self.assertEquals("011", p.heading_to_dest)
+        self.assertEquals("M", p.heading_to_dest_type)
+        self.assertEquals("82", p.checksum)
 
 
 class TestGPBOD(unittest.TestCase):
@@ -963,6 +1047,27 @@ class TestGPWCV(unittest.TestCase):
         result = p.check_chksum()
 
         self.assertFalse(result)
+
+
+class TestGPWNC(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPWNC()
+        p.parse("$GPWNC,1.1,N,2.2,K,c--c,c--c*ff")
+
+        self.assertEquals("GPWNC", p.sen_type)
+        self.assertEquals("1.1", p.dist_nautical_miles)
+        self.assertEquals("N", p.dist_naut_unit)
+        self.assertEquals("2.2", p.dist_km)
+        self.assertEquals("K", p.dist_km_unit)
+        self.assertEquals("c--c", p.waypoint_origin_id)
+        self.assertEquals("c--c", p.waypoint_dest_id)
+        self.assertEquals("ff", p.checksum)
 
 
 class TestGPWPL(unittest.TestCase):

@@ -79,6 +79,73 @@ class GPAAM(NMEASentence):
         super(GPAAM, self).__init__(parse_map)
 
 
+class GPALM(NMEASentence):
+    """ GPS Almanac data
+    """
+    def __init__(self):
+        parse_map = (("Total number of messages", "total_num_msgs"),
+                     ("Message number", "msg_num"),
+                     ("Satellite PRN number", "sat_prn_num"), # 01 - 32
+                     ("GPS week number", "gps_week_num"), # Week since Jan 6 1980
+                     ("SV Health, bits 17-24 of each almanac page", "sv_health"),
+                     ("Eccentricity", "eccentricity"),
+                     ("Almanac Reference Time", "alamanac_ref_time"),
+                     ("Inclination Angle", "inc_angle"),
+                     ("Rate of right ascension", "rate_right_asc"),
+                     ("Root of semi-major axis", "root_semi_major_axis"),
+                     ("Argument of perigee", "arg_perigee"),
+                     ("Longitude of ascension node", "lat_asc_node"),
+                     ("Mean anomaly", "mean_anom"),
+                     ("F0 Clock parameter", "f0_clock_param"),
+                     ("F1 Clock parameter", "f1_clock_param"))
+
+        super(GPALM, self).__init__(parse_map)
+
+
+class GPAPA(NMEASentence):
+    """ Autopilot Sentence "A"
+    """
+
+    def __init__(self):
+        parse_map = (
+            ("General Status", "status_gen"),
+            ("Cycle lock Status", "status_cycle_lock"),
+            ("Cross Track Error Magnitude", "cross_track_err_mag"),
+            ("Direction to Steer (L or R)", "dir_steer"),
+            ("Cross Track Units (Nautical Miles or KM)", "cross_track_unit"),
+            ("Arrival Circle Entered", "arr_circle_entered"), # A = True
+            ("Perpendicular passed at waypoint", "perp_passed"), # A = True
+            ("Bearing origin to destination", "bearing_to_dest"),
+            ("Bearing type", "bearing_type"), # M = Magnetic, T = True
+            ("Destination waypoint ID", "dest_waypoint_id"))
+
+        super(GPAPA, self).__init__(parse_map)
+
+
+class GPAPB(NMEASentence):
+    """ Autopilot Sentence "B"
+    """
+
+    def __init__(self):
+        parse_map = (
+            ("General Status", "status_gen"),
+            ("Cycle lock Status", "status_cycle_lock"),
+            ("Cross Track Error Magnitude", "cross_track_err_mag"),
+            ("Direction to Steer (L or R)", "dir_steer"),
+            ("Cross Track Units (Nautical Miles or KM)", "cross_track_unit"),
+            ("Arrival Circle Entered", "arr_circle_entered"), # A = True
+            ("Perpendicular passed at waypoint", "perp_passed"), # A = True
+            ("Bearing origin to destination", "bearing_to_dest"),
+            ("Bearing type", "bearing_type"), # M = Magnetic, T = True
+            ("Destination waypoint ID", "dest_waypoint_id"),
+            ("Bearing, present position to dest", "bearing_pres_dest"),
+            ("Bearing to destination, type", "bearing_pres_dest_type"), # M = Magnetic, T = True
+            ("Heading to steer to destination", "heading_to_dest"),
+            ("Heading to steer to destination type", "heading_to_dest_type")) # M = Magnetic, T = True
+
+        super(GPAPB, self).__init__(parse_map)
+
+
 class GPBOD(NMEASentence):
     def __init__(self):
         # 045.,T,023.,M,DEST,START
@@ -532,7 +599,14 @@ class GPWNC(NMEASentence):
     """ Distance, Waypoint to Waypoint
     """
     def __init__(self):
-        parse_map = ()
+        parse_map = (
+            ("Distance, Nautical Miles", "dist_nautical_miles"),
+            ("Distance Nautical Miles Unit", "dist_naut_unit"),
+            ("Distance, Kilometers", "dist_km"),
+            ("Distance, Kilometers Unit", "dist_km_unit"),
+            ("Origin Waypoint ID", "waypoint_origin_id"),
+            ("Destination Waypoint ID", "waypoint_dest_id"))
+
         super(GPWNC, self).__init__(parse_map)
 
 
@@ -580,32 +654,8 @@ class GPZDA(NMEASentence):
 # ---------------------------------- Not Yet Implimented --------------------- #
 # ---------------------------------------------------------------------------- #
 
-#class GPALM(NMEASentence):
-#    """
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPALM).__init__()
-
-
-#class GPAPA(NMEASentence):
-#    """
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPAPA).__init__()
-
-
-#class GPAPB(NMEASentence):
-#    """
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPAPB).__init__()
-
-
 #class GPASD(NMEASentence):
-#    """
+#    """ Auto-pilot system data (Unknown format)
 #    """
 #    def __init__(self):
 #        parse_map = ()
