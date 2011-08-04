@@ -65,6 +65,19 @@ class NMEASentence(object):
 # supported. They are being added as properties and other useful functions are
 # implimented. Unit tests are also provided.
 # ---------------------------------------------------------------------------- #
+class GPAAM(NMEASentence):
+    """ Waypoint Arrival Alarm
+    """
+    def __init__(self):
+        parse_map = (
+            ("Arrival Circle Entered", "arrival_circ_entered"),
+            ("Perpendicular Passed", "perp_passed"),
+            ("Circle Radius", "circle_rad"),
+            ("Nautical Miles", "circle_rad_unit"),
+            ("Waypoint ID", "waypoint_id"))
+
+        super(GPAAM, self).__init__(parse_map)
+
 
 class GPBOD(NMEASentence):
     def __init__(self):
@@ -558,13 +571,6 @@ class GPZDA(NMEASentence):
 
 # ---------------------------------- Not Yet Implimented --------------------- #
 # ---------------------------------------------------------------------------- #
-
-#class GPAAM(NMEASentence):
-#    """
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPAAM).__init__()
 
 #class GPALM(NMEASentence):
 #    """

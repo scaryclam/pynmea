@@ -1,8 +1,8 @@
 import unittest
-from pynmea.nmea import (NMEASentence, GPGLL, GPBOD, GPBWC, GPBWR, GPGGA,
-                         GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN, GPRMA,
-                         GPRMB, GPRMC, GPRTE, GPR00, GPTRF, GPVBW, GPVTG,
-                         GPWCV, GPWPL, GPXTE)
+from pynmea.nmea import (NMEASentence, GPAAM, GPGLL, GPBOD, GPBWC, GPBWR,
+                         GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA, GPSTN,
+                         GPRMA, GPRMB, GPRMC, GPRTE, GPR00, GPTRF, GPVBW,
+                         GPVTG, GPWCV, GPWPL, GPXTE)
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -72,6 +72,27 @@ class TestNMEAParse(unittest.TestCase):
         result = p.check_chksum()
 
         self.assertFalse(result)
+
+
+class TestGPAAM(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPAAM()
+        p.parse("$GPAAM,A,A,0.10,N,WPTNME*32")
+
+        self.assertEquals("GPAAM", p.sen_type)
+        self.assertEquals("A", p.arrival_circ_entered)
+        self.assertEquals("A", p.perp_passed)
+        self.assertEquals("0.10", p.circle_rad)
+        self.assertEquals("N", p.circle_rad_unit)
+        self.assertEquals("WPTNME", p.waypoint_id)
+        self.assertEquals("32", p.checksum)
+
 
 class TestGPBOD(unittest.TestCase):
     def setUp(self):
