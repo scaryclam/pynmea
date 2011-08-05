@@ -654,13 +654,6 @@ class GPZDA(NMEASentence):
 # ---------------------------------- Not Yet Implimented --------------------- #
 # ---------------------------------------------------------------------------- #
 
-#class GPASD(NMEASentence):
-#    """ Auto-pilot system data (Unknown format)
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPASD).__init__()
-
 #class GPBEC(NMEASentence):
 #    """ Bearing & Distance to Waypoint, Dead Reckoning
 #    """
@@ -873,3 +866,14 @@ class GPZDA(NMEASentence):
 #        parse_map = ()
 #        super(GPZTG).__init__(parse_map)
 
+
+# ---------------------------------------------------------------------------- #
+# -------------------------- Unknown Formats --------------------------------- #
+# ---------------------------------------------------------------------------- #
+
+#class GPASD(NMEASentence):
+#    """ Auto-pilot system data (Unknown format)
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPASD).__init__()
