@@ -146,6 +146,28 @@ class GPAPB(NMEASentence):
         super(GPAPB, self).__init__(parse_map)
 
 
+class GPBEC(NMEASentence):
+    """ Bearing & Distance to Waypoint, Dead Reckoning
+    """
+    def __init__(self):
+        parse_map = (
+            ("Timestamp", "timestamp"),
+            ("Waypoint Latitude", "waypoint_lat"),
+            ("Waypoint Latitude direction", "waypoint_lat_dir"),
+            ("Waypoint Longitude", "waypoint_lon"),
+            ("Waypoint Longitude direction", "waypoint_lon_dir"),
+            ("Bearing, true", "bearing_true"),
+            ("Bearing True symbol", "bearing_true_sym"), # T = true
+            ("Bearing Magnetic", "bearing_mag"),
+            ("Bearing Magnetic symbol", "bearing_mag_sym"),
+            ("Nautical Miles", "nautical_miles"),
+            ("Nautical Miles symbol", "nautical_miles_sym"),
+            ("Waypoint ID", "waypoint_id"),
+            ("FAA mode indicator", "faa_mode"))
+
+        super(GPBEC, self).__init__(parse_map)
+
+
 class GPBOD(NMEASentence):
     def __init__(self):
         # 045.,T,023.,M,DEST,START
@@ -654,12 +676,7 @@ class GPZDA(NMEASentence):
 # ---------------------------------- Not Yet Implimented --------------------- #
 # ---------------------------------------------------------------------------- #
 
-#class GPBEC(NMEASentence):
-#    """ Bearing & Distance to Waypoint, Dead Reckoning
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPBEC).__init__(parse_map)
+
 
 #class GPBWW(NMEASentence):
 #    """ Bearing, Waypoint to Waypoint

@@ -1,8 +1,8 @@
 import unittest
-from pynmea.nmea import (NMEASentence, GPAAM, GPALM, GPAPA, GPAPB, GPGLL, GPBOD,
-                         GPBWC, GPBWR, GPGGA, GPGSA, GPGSV, GPHDG, GPHDT, GPZDA,
-                         GPSTN, GPRMA, GPRMB, GPRMC, GPRTE, GPR00, GPTRF, GPVBW,
-                         GPVTG, GPWCV, GPWNC, GPWPL, GPXTE)
+from pynmea.nmea import (NMEASentence, GPAAM, GPALM, GPAPA, GPAPB, GPBEC, GPBOD,
+                         GPBWC, GPBWR, GPGGA, GPGLL, GPGSA, GPGSV, GPHDG, GPHDT,
+                         GPZDA, GPSTN, GPRMA, GPRMB, GPRMC, GPRTE, GPR00, GPTRF,
+                         GPVBW, GPVTG, GPWCV, GPWNC, GPWPL, GPXTE)
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -176,6 +176,78 @@ class TestGPAPB(unittest.TestCase):
         self.assertEquals("011", p.heading_to_dest)
         self.assertEquals("M", p.heading_to_dest_type)
         self.assertEquals("82", p.checksum)
+
+
+class TestGPBEC(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map_1(self):
+        """ No FAA mode indicator
+        """
+        p = GPBEC()
+        p.parse("$GPBEC,081837,,,,,,T,,M,,N,*13")
+
+        self.assertEquals("GPBEC", p.sen_type)
+        self.assertEquals("081837", p.timestamp)
+        self.assertEquals("", p.waypoint_lat)
+        self.assertEquals("", p.waypoint_lat_dir)
+        self.assertEquals("", p.waypoint_lon)
+        self.assertEquals("", p.waypoint_lon_dir)
+        self.assertEquals("", p.bearing_true)
+        self.assertEquals("T", p.bearing_true_sym)
+        self.assertEquals("", p.bearing_mag)
+        self.assertEquals("M", p.bearing_mag_sym)
+        self.assertEquals("", p.nautical_miles)
+        self.assertEquals("N", p.nautical_miles_sym)
+        self.assertEquals("", p.waypoint_id)
+        self.assertEquals("13", p.checksum)
+
+    def test_parses_map_2(self):
+        """ No FAA mode indicator
+        """
+        p = GPBEC()
+        p.parse("GPBEC,220516,5130.02,N,00046.34,W,213.8,T,218.0,M,0004.6,N,EGLM*11")
+
+        self.assertEquals("GPBEC", p.sen_type)
+        self.assertEquals("220516", p.timestamp)
+        self.assertEquals("5130.02", p.waypoint_lat)
+        self.assertEquals("N", p.waypoint_lat_dir)
+        self.assertEquals("00046.34", p.waypoint_lon)
+        self.assertEquals("W", p.waypoint_lon_dir)
+        self.assertEquals("213.8", p.bearing_true)
+        self.assertEquals("T", p.bearing_true_sym)
+        self.assertEquals("218.0", p.bearing_mag)
+        self.assertEquals("M", p.bearing_mag_sym)
+        self.assertEquals("0004.6", p.nautical_miles)
+        self.assertEquals("N", p.nautical_miles_sym)
+        self.assertEquals("EGLM", p.waypoint_id)
+        self.assertEquals("11", p.checksum)
+
+    def test_parses_map_3(self):
+        """ WITH FAA mode indicator
+        """
+        p = GPBEC()
+        p.parse("GPBEC,220516,5130.02,N,00046.34,W,213.8,T,218.0,M,0004.6,N,EGLM,X*11")
+
+        self.assertEquals("GPBEC", p.sen_type)
+        self.assertEquals("220516", p.timestamp)
+        self.assertEquals("5130.02", p.waypoint_lat)
+        self.assertEquals("N", p.waypoint_lat_dir)
+        self.assertEquals("00046.34", p.waypoint_lon)
+        self.assertEquals("W", p.waypoint_lon_dir)
+        self.assertEquals("213.8", p.bearing_true)
+        self.assertEquals("T", p.bearing_true_sym)
+        self.assertEquals("218.0", p.bearing_mag)
+        self.assertEquals("M", p.bearing_mag_sym)
+        self.assertEquals("0004.6", p.nautical_miles)
+        self.assertEquals("N", p.nautical_miles_sym)
+        self.assertEquals("EGLM", p.waypoint_id)
+        self.assertEquals("X", p.faa_mode)
+        self.assertEquals("11", p.checksum)
 
 
 class TestGPBOD(unittest.TestCase):
