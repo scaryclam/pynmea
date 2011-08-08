@@ -690,10 +690,6 @@ class GPZDA(NMEASentence):
 # ---------------------------------- Not Yet Implimented --------------------- #
 # ---------------------------------------------------------------------------- #
 
-
-
-
-
 #class GPDBT(NMEASentence):
 #    """ Depth Below Transducer
 #    """
@@ -701,15 +697,8 @@ class GPZDA(NMEASentence):
 #        parse_map = ()
 #        super(GPDBT).__init__(parse_map)
 
-#class GPDCN(NMEASentence):
-#    """ Decca Position
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPDCN).__init__(parse_map)
-
 #class GPDPT(NMEASentence):
-#    """ Depth
+#    """ Heading - Deviation and Variation
 #    """
 #    def __init__(self):
 #        parse_map = ()
@@ -862,8 +851,6 @@ class GPZDA(NMEASentence):
 #        parse_map = ()
 #        super(GPVPW).__init__(parse_map)
 
-
-
 #class GPXDR(NMEASentence):
 #    """ Transducer Measurements
 #    """
@@ -903,3 +890,14 @@ class GPZDA(NMEASentence):
 #    def __init__(self):
 #        parse_map = ()
 #        super(GPASD).__init__()
+
+# ---------------------------------------------------------------------------- #
+# -------------------------- Obsolete Formats -------------------------------- #
+# ---------------------------------------------------------------------------- #
+
+#class GPDCN(NMEASentence):
+#    """ Decca Position (obsolete)
+#    """
+#    def __init__(self):
+#        parse_map = ()
+#        super(GPDCN).__init__(parse_map)
