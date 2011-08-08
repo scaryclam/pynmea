@@ -259,6 +259,21 @@ class GPGGA(NMEASentence):
         super(GPGGA, self).__init__(parse_map)
 
 
+class GPBWW(NMEASentence):
+    """ Bearing, Waypoint to Waypoint
+    """
+    def __init__(self):
+        parse_map = (
+            ("Bearing degrees True", "bearing_deg_true"),
+            ("Bearing degrees True Symbol", "bearing_deg_true_sym"),
+            ("Bearing degrees Magnitude", "bearing_deg_mag"),
+            ("Bearing degrees Magnitude Symbol", "bearing_deg_mag_sym"),
+            ("Destination Waypoint ID", "waypoint_id_dest"),
+            ("Origin Waypoint ID", "waypoint_id_orig"))
+
+        super(GPBWW, self).__init__(parse_map)
+
+
 class GPGLL(NMEASentence):
     def __init__(self):
         parse_map = (
@@ -268,7 +283,6 @@ class GPGLL(NMEASentence):
             ('Longitude Direction', 'lon_dir'),
             ('Timestamp', 'timestamp'),
             ('Data Validity', "data_valid"))
-            #('Checksum', 'checksum'))
 
         super(GPGLL, self).__init__(parse_map)
 
@@ -678,12 +692,7 @@ class GPZDA(NMEASentence):
 
 
 
-#class GPBWW(NMEASentence):
-#    """ Bearing, Waypoint to Waypoint
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPBWW).__init__(parse_map)
+
 
 #class GPDBT(NMEASentence):
 #    """ Depth Below Transducer

@@ -1,8 +1,8 @@
 import unittest
 from pynmea.nmea import (NMEASentence, GPAAM, GPALM, GPAPA, GPAPB, GPBEC, GPBOD,
-                         GPBWC, GPBWR, GPGGA, GPGLL, GPGSA, GPGSV, GPHDG, GPHDT,
-                         GPZDA, GPSTN, GPRMA, GPRMB, GPRMC, GPRTE, GPR00, GPTRF,
-                         GPVBW, GPVTG, GPWCV, GPWNC, GPWPL, GPXTE)
+                         GPBWC, GPBWR, GPBWW, GPGGA, GPGLL, GPGSA, GPGSV, GPHDG,
+                         GPHDT, GPZDA, GPSTN, GPRMA, GPRMB, GPRMC, GPRTE, GPR00,
+                         GPTRF, GPVBW, GPVTG, GPWCV, GPWNC, GPWPL, GPXTE)
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -339,6 +339,27 @@ class TestGPBWR(unittest.TestCase):
         self.assertEquals("N", p.range_unit)
         self.assertEquals("0001", p.waypoint_name)
         self.assertEquals("3E", p.checksum)
+
+
+class TestGPBWW(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        p = GPBWW()
+        p.parse("$GPBWW,x.x,T,x.x,M,c--c,c--c*ff")
+
+        self.assertEquals("GPBWW", p.sen_type)
+        self.assertEquals("x.x", p.bearing_deg_true)
+        self.assertEquals("T", p.bearing_deg_true_sym)
+        self.assertEquals("x.x", p.bearing_deg_mag)
+        self.assertEquals("M", p.bearing_deg_mag_sym)
+        self.assertEquals("c--c", p.waypoint_id_dest)
+        self.assertEquals("c--c", p.waypoint_id_orig)
+        self.assertEquals("ff", p.checksum)
 
 
 class TestGPGGA(unittest.TestCase):
