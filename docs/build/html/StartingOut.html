@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>&lt;no title&gt; &mdash; pynmea 0.4 documentation</title>
+    <title>Starting Out &mdash; pynmea 0.4 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -25,7 +25,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pynmea 0.4 documentation" href="index.html" /> 
+    <link rel="top" title="pynmea 0.4 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to pynmea’s documentation!" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -34,6 +35,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pynmea’s documentation!"
+             accesskey="P">previous</a> |</li>
         <li><a href="index.html">pynmea 0.4 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -43,7 +47,10 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <p>Using the NMEA part of this library is simple:</p>
+  <div class="section" id="starting-out">
+<h1>Starting Out<a class="headerlink" href="#starting-out" title="Permalink to this headline">¶</a></h1>
+<p>Here is a short, quickstart guide to using pynmea</p>
+<p>Using the NMEA part of this library is simple:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pynmea</span> <span class="kn">import</span> <span class="n">nmea</span>
 
 <span class="c"># This is a GPGGA sentence</span>
@@ -56,7 +63,37 @@
 <span class="n">gpgga</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>That&#8217;s it. All of the data from the gpgga sentence is not accessible on the object. So gpgga.latitude is &#8216;4925.4895&#8217; and gpgga.num_sats is &#8216;05&#8217;.</p>
+<p>That&#8217;s it. All of the data from the gpgga sentence is now accessible on the object. So gpgga.latitude is &#8216;4925.4895&#8217; and gpgga.num_sats is &#8216;05&#8217;.</p>
+<p>This is only of limited use however. Splitting up and parsing the raw data is one of the more tedious jobs. For this reason the NMEAStreamer
+was created:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pynmea.streamer</span> <span class="kn">import</span> <span class="n">NMEAStreamer</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;example_data_file.txt&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+    <span class="n">streamer</span> <span class="o">=</span> <span class="n">NMEAStreamer</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+    <span class="n">next_data</span> <span class="o">=</span> <span class="n">streamer</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="n">next_data</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">+=</span> <span class="n">next_data</span>
+        <span class="n">next_data</span> <span class="o">=</span> <span class="n">streamer</span><span class="p">(</span><span class="n">read</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This code snippet would read an entire NMEA data file and output the contents into data, which is a list of sentences.
+You may also feed the streamer raw data from memory:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pynmea.streamer</span> <span class="kn">import</span> <span class="n">NMEAStreamer</span>
+
+<span class="n">streamer</span> <span class="o">=</span> <span class="n">NMEAStreamer</span><span class="p">()</span>
+
+<span class="n">raw_data</span> <span class="o">=</span> <span class="s">&#39;$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F</span><span class="se">\n</span><span class="s">$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F</span><span class="se">\n</span><span class="s">$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F&#39;</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">streamer</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>data is then a list of sentences.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Please be aware that this is a new feature and is not yet finalised. The next iteration of this object will also have the option of returning NMEA objects instead of string sentences.</p>
+</div>
+</div>
 
 
           </div>
@@ -64,6 +101,9 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to pynmea&#8217;s documentation!</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/StartingOut.txt"
@@ -92,6 +132,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pynmea’s documentation!"
+             >previous</a> |</li>
         <li><a href="index.html">pynmea 0.4 documentation</a> &raquo;</li> 
       </ul>
     </div>

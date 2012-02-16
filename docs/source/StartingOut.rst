@@ -1,3 +1,8 @@
+Starting Out
+------------
+
+Here is a short, quickstart guide to using pynmea
+
 Using the NMEA part of this library is simple:
 
 .. code-block:: python
@@ -14,4 +19,37 @@ Using the NMEA part of this library is simple:
     gpgga.parse(data)
 
 
-That's it. All of the data from the gpgga sentence is not accessible on the object. So gpgga.latitude is '4925.4895' and gpgga.num_sats is '05'.
+That's it. All of the data from the gpgga sentence is now accessible on the object. So gpgga.latitude is '4925.4895' and gpgga.num_sats is '05'.
+
+This is only of limited use however. Splitting up and parsing the raw data is one of the more tedious jobs. For this reason the NMEAStreamer
+was created:
+
+.. code-block:: python
+
+    from pynmea.streamer import NMEAStreamer
+
+    with open('example_data_file.txt', 'r') as data_file:
+        streamer = NMEAStreamer(data_file)
+        next_data = streamer.read()
+        data = []
+        while next_data:
+            data += next_data
+            next_data = streamer(read)
+
+This code snippet would read an entire NMEA data file and output the contents into data, which is a list of sentences.
+You may also feed the streamer raw data from memory:
+
+.. code-block:: python
+
+    from pynmea.streamer import NMEAStreamer
+
+    streamer = NMEAStreamer()
+
+    raw_data = '$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F\n$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F\n$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F'
+
+    data = streamer._split(raw_data)
+
+data is then a list of sentences.
+
+.. note:: Please be aware that this is a new feature and is not yet finalised. The next iteration of this object will also have the option of returning NMEA objects instead of string sentences.
+

@@ -6,10 +6,14 @@
 Welcome to pynmea's documentation!
 ==================================
 
+This is some quick documentation to help you get started with using the library.
+
 Contents:
 
 .. toctree::
    :maxdepth: 2
+
+   StartingOut
 
 
 
