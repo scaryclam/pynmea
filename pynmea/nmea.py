@@ -36,7 +36,7 @@ class NMEASentence(object):
             self.parts[0] = self.parts[0][1:]
         self.sen_type = self.parts[0]
 
-    def parse(self, nmea_str):
+    def parse(self, nmea_str, ignore_err=False):
         """ Use the parse map. Parse map should be in the format:
             (('Field name', 'field_name'),
              ('Field name', 'field_name'))
@@ -46,9 +46,16 @@ class NMEASentence(object):
         """
 
         self._parse(nmea_str)
-        assert len(self.parts[1:]) <= len(self.parse_map)
-        for index, item in enumerate(self.parts[1:]):
-            setattr(self, self.parse_map[index][1], item)
+
+        #assert len(self.parts[1:]) <= len(self.parse_map)
+        parts_len = len(self.parts) - 1
+
+        for index, item in enumerate(self.parse_map):
+            if index + 1 > parts_len:
+                break
+            setattr(self, item[1], self.parts[index + 1])
+        #for index, item in enumerate(self.parts[1:]):
+            #setattr(self, self.parse_map[index][1], item)
 
     def check_chksum(self):
         # If there is no checksum, raise AssertionError
@@ -901,3 +908,40 @@ class GPZDA(NMEASentence):
 #    def __init__(self):
 #        parse_map = ()
 #        super(GPDCN).__init__(parse_map)
+
+
+# PROPRIETRY SENTENCES
+
+# -- GARMIN -- #
+class PGRME(NMEASentence):
+    """ GARMIN Estimated position error
+    """
+    def __init__(self):
+        parse_map = (("Estimated Horiz. Position Error", "hpe"),
+                     ("Estimated Horiz. Position Error Unit (M)", "hpe_unit"),
+                     ("Estimated Vert. Position Error", "vpe"),
+                     ("Estimated Vert. Position Error Unit (M)", "vpe_unit"),
+                     ("Estimated Horiz. Position Error", "osepe"),
+                     ("Overall Spherical Equiv. Position Error", "osepe_unit"))
+
+        super(PGRME, self).__init__(parse_map)
+
+
+class PGRMM(NMEASentence):
+    """ GARMIN Map Datum
+    """
+    def __init__(self):
+        parse_map = (('Currently Active Datum', 'datum'),)
+
+        super(PGRMM, self).__init__(parse_map)
+
+class PGRMZ(NMEASentence):
+    """ GARMIN Altitude Information
+    """
+    def __init__(self):
+        parse_map = (("Altitude", "altitude"),
+                     ("Altitude Units (Feet)", "altitude_unit"),
+                     ("Positional Fix Dimension (2=user, 3=GPS)",
+                      "pos_fix_dim"))
+
+        super(PGRMZ, self).__init__(parse_map)

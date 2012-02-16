@@ -2,7 +2,9 @@ import unittest
 from pynmea.nmea import (NMEASentence, GPAAM, GPALM, GPAPA, GPAPB, GPBEC, GPBOD,
                          GPBWC, GPBWR, GPBWW, GPGGA, GPGLL, GPGSA, GPGSV, GPHDG,
                          GPHDT, GPZDA, GPSTN, GPRMA, GPRMB, GPRMC, GPRTE, GPR00,
-                         GPTRF, GPVBW, GPVTG, GPWCV, GPWNC, GPWPL, GPXTE)
+                         GPTRF, GPVBW, GPVTG, GPWCV, GPWNC, GPWPL, GPXTE,
+                         PGRME, PGRMZ, PGRMM)
+
 from pynmea.utils import checksum_calc
 
 class TestNMEAParse(unittest.TestCase):
@@ -1224,6 +1226,40 @@ class TestGPXTE(unittest.TestCase):
         self.assertEquals("L", p.correction_dir)
         self.assertEquals("N", p.dist_units)
         self.assertEquals("6D", p.checksum)
+
+
+class TestPGRME(unittest.TestCase):
+    def test_parses_map(self):
+        p = PGRME()
+        p.parse("$PGRME,3.1,M,4.2,M,5.2,M*2D")
+
+        self.assertEqual("PGRME", p.sen_type)
+        self.assertEqual("3.1", p.hpe)
+        self.assertEqual("M", p.hpe_unit)
+        self.assertEqual("4.2", p.vpe)
+        self.assertEqual("M", p.vpe_unit)
+        self.assertEqual("5.2", p.osepe)
+        self.assertEqual("M", p.osepe_unit)
+
+
+class TestPGRMM(unittest.TestCase):
+    def test_parses_map(self):
+        p = PGRMM()
+        p.parse("PGRMM,WGS 84*06")
+
+        self.assertEqual("PGRMM", p.sen_type)
+        self.assertEqual("WGS 84", p.datum)
+
+
+class TestPGRMZ(unittest.TestCase):
+    def test_parses_map(self):
+        p = PGRMZ()
+        p.parse("PGRMZ,492,f,3*14")
+
+        self.assertEqual("PGRMZ", p.sen_type)
+        self.assertEqual("492", p.altitude)
+        self.assertEqual("f", p.altitude_unit)
+        self.assertEqual("3", p.pos_fix_dim)
 
 
 class TestUtils(unittest.TestCase):

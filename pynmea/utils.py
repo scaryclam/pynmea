@@ -13,3 +13,4 @@ def checksum_calc(nmea_str):
         chksum_val ^= ord(next_char)
 
     return "%02X" % chksum_val
+
