@@ -935,6 +935,7 @@ class PGRMM(NMEASentence):
 
         super(PGRMM, self).__init__(parse_map)
 
+
 class PGRMZ(NMEASentence):
     """ GARMIN Altitude Information
     """

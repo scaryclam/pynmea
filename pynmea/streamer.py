@@ -18,12 +18,22 @@ class NMEAStream(object):
             append to the start of the data stream on the next call.
             This ensures that only full sentences are returned.
         """
-        data = self.stream.read(size)
-        data = self.head + data
+        read_data = self.stream.read(size)
+        data = self.head + read_data
         raw_sentences = self._split(data)
+        if not read_data:
+            self.head = ''
+            return raw_sentences
         self.head = raw_sentences[-1]
         full_sentences = raw_sentences[:-1]
         return full_sentences
+
+    def get_nmea_objects(self, size=1024):
+        """ Use read to get sentence strings and then use _guess_type to
+            find  the object
+        """
+        pass
+
 
     def _split(self, data, separator=None):
         """ Take some data and split up based on the notion that a sentence
