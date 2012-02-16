@@ -294,7 +294,6 @@ class GPGLL(NMEASentence):
         super(GPGLL, self).__init__(parse_map)
 
         self._use_data_validity = False
-        float
 
     #def _parse(self, nmea_str):
         #""" GPGGL Allows for a couple of different formats.
