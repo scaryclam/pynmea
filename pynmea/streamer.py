@@ -13,7 +13,29 @@ class NMEAStream(object):
         self.stream = stream_obj
         self.head = ''
 
-    def read(self, size=1024):
+    def get_strings(self, size=1024):
+        """ Read and return sentences as strings
+        """
+        return self._read(size=size)
+
+    def get_objects(self, size=1024):
+        """ Get sentences but return list of NMEA objects
+        """
+        str_data = self._read(size=size)
+        nmea_objects = []
+        for nmea_str in str_data:
+            try:
+                nmea_ob = self._get_type(nmea_str)()
+            except TypeError:
+                # NMEA sentence was not recognised
+                continue
+            nmea_ob.parse(nmea_str)
+            nmea_objects.append(nmea_ob)
+
+        return nmea_objects
+
+
+    def _read(self, size=1024):
         """ Read size bytes of data. Always strip off the last record and
             append to the start of the data stream on the next call.
             This ensures that only full sentences are returned.
@@ -28,12 +50,11 @@ class NMEAStream(object):
         full_sentences = raw_sentences[:-1]
         return full_sentences
 
-    def get_nmea_objects(self, size=1024):
-        """ Use read to get sentence strings and then use _guess_type to
-            find  the object
-        """
-        pass
-
+    def _get_type(self, sentence):
+        sen_type = sentence.split(',')[0].lstrip('$')
+        sen_mod = __import__('pynmea.nmea', fromlist=[sen_type])
+        sen_obj = getattr(sen_mod, sen_type, None)
+        return sen_obj
 
     def _split(self, data, separator=None):
         """ Take some data and split up based on the notion that a sentence
