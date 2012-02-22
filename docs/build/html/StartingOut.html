@@ -70,29 +70,39 @@ was created:</p>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;example_data_file.txt&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
     <span class="n">streamer</span> <span class="o">=</span> <span class="n">NMEAStreamer</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
-    <span class="n">next_data</span> <span class="o">=</span> <span class="n">streamer</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">next_data</span> <span class="o">=</span> <span class="n">streamer</span><span class="o">.</span><span class="n">get_strings</span><span class="p">()</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">while</span> <span class="n">next_data</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">+=</span> <span class="n">next_data</span>
         <span class="n">next_data</span> <span class="o">=</span> <span class="n">streamer</span><span class="p">(</span><span class="n">read</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This code snippet would read an entire NMEA data file and output the contents into data, which is a list of sentences.
-You may also feed the streamer raw data from memory:</p>
+<p>This code snippet would read an entire NMEA data file and output the contents into data, which is a list of sentences.</p>
+<p>You may also chose to return a list of NMEA objects rather than plain text strings:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pynmea.streamer</span> <span class="kn">import</span> <span class="n">NMEAStreamer</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;example_data_file.txt&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
+    <span class="n">streamer</span> <span class="o">=</span> <span class="n">NMEAStreamer</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+    <span class="n">next_data</span> <span class="o">=</span> <span class="n">streamer</span><span class="o">.</span><span class="n">get_objects</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="n">next_data</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">+=</span> <span class="n">next_data</span>
+        <span class="n">next_data</span> <span class="o">=</span> <span class="n">streamer</span><span class="p">(</span><span class="n">read</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You may also feed the streamer raw data from memory:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pynmea.streamer</span> <span class="kn">import</span> <span class="n">NMEAStreamer</span>
 
 <span class="n">streamer</span> <span class="o">=</span> <span class="n">NMEAStreamer</span><span class="p">()</span>
 
 <span class="n">raw_data</span> <span class="o">=</span> <span class="s">&#39;$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F</span><span class="se">\n</span><span class="s">$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F</span><span class="se">\n</span><span class="s">$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F&#39;</span>
 
-<span class="n">data</span> <span class="o">=</span> <span class="n">streamer</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span>
+<span class="n">data_obs</span> <span class="o">=</span> <span class="n">streamer</span><span class="o">.</span><span class="n">get_objects</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">raw_data</span><span class="p">)</span>
+<span class="c"># Remember to make sure you feed some empty data to flush the last of the data out</span>
+<span class="n">data_obs</span> <span class="o">+=</span> <span class="n">streamer</span><span class="o">.</span><span class="n">get_objects</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>data is then a list of sentences.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Please be aware that this is a new feature and is not yet finalised. The next iteration of this object will also have the option of returning NMEA objects instead of string sentences.</p>
-</div>
+<p>data is then a list of nmea objects. The same can be done with get_string(data=data) to retrieve a list of strings.</p>
 </div>
 
 

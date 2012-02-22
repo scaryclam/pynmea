@@ -30,13 +30,29 @@ was created:
 
     with open('example_data_file.txt', 'r') as data_file:
         streamer = NMEAStreamer(data_file)
-        next_data = streamer.read()
+        next_data = streamer.get_strings()
         data = []
         while next_data:
             data += next_data
             next_data = streamer(read)
 
 This code snippet would read an entire NMEA data file and output the contents into data, which is a list of sentences.
+
+You may also chose to return a list of NMEA objects rather than plain text strings:
+
+.. code-block:: python
+
+    from pynmea.streamer import NMEAStreamer
+
+    with open('example_data_file.txt', 'r') as data_file:
+        streamer = NMEAStreamer(data_file)
+        next_data = streamer.get_objects()
+        data = []
+        while next_data:
+            data += next_data
+            next_data = streamer(read)
+
+
 You may also feed the streamer raw data from memory:
 
 .. code-block:: python
@@ -47,9 +63,10 @@ You may also feed the streamer raw data from memory:
 
     raw_data = '$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F\n$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F\n$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F'
 
-    data = streamer._split(raw_data)
+    data_obs = streamer.get_objects(data=raw_data)
+    # Remember to make sure you feed some empty data to flush the last of the data out
+    data_obs += streamer.get_objects(data='')
 
-data is then a list of sentences.
+data is then a list of nmea objects. The same can be done with get_string(data=data) to retrieve a list of strings.
 
-.. note:: Please be aware that this is a new feature and is not yet finalised. The next iteration of this object will also have the option of returning NMEA objects instead of string sentences.
 

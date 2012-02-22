@@ -1,5 +1,7 @@
 """ For dealing with streams of nmea data
 """
+from pynmea.exceptions import NoDataGivenError
+
 
 class NMEAStream(object):
     """ NMEAStream object is used to
@@ -13,15 +15,15 @@ class NMEAStream(object):
         self.stream = stream_obj
         self.head = ''
 
-    def get_strings(self, size=1024):
+    def get_strings(self, data=None, size=1024):
         """ Read and return sentences as strings
         """
-        return self._read(size=size)
+        return self._read(data=data, size=size)
 
-    def get_objects(self, size=1024):
+    def get_objects(self, data=None, size=1024):
         """ Get sentences but return list of NMEA objects
         """
-        str_data = self._read(size=size)
+        str_data = self._read(data=data, size=size)
         nmea_objects = []
         for nmea_str in str_data:
             try:
@@ -35,12 +37,20 @@ class NMEAStream(object):
         return nmea_objects
 
 
-    def _read(self, size=1024):
+    def _read(self, data=None, size=1024):
         """ Read size bytes of data. Always strip off the last record and
             append to the start of the data stream on the next call.
             This ensures that only full sentences are returned.
         """
-        read_data = self.stream.read(size)
+        if not data and not self.stream and not self.head:
+            # If there's no data and no stream, raise an error
+            raise NoDataGivenError('No data was provided')
+
+        if not data and self.stream:
+            read_data = self.stream.read(size)
+        else:
+            read_data = data
+
         data = self.head + read_data
         raw_sentences = self._split(data)
         if not read_data:
@@ -51,6 +61,13 @@ class NMEAStream(object):
         return full_sentences
 
     def _get_type(self, sentence):
+        """ Get the NMEA type and return the appropriate object. Returns
+            None if no such object was found.
+
+            TODO: raise error instead of None. Failing silently is a Bad Thing.
+            We can always catch the error later if the user wishes to supress
+            errors.
+        """
         sen_type = sentence.split(',')[0].lstrip('$')
         sen_mod = __import__('pynmea.nmea', fromlist=[sen_type])
         sen_obj = getattr(sen_mod, sen_type, None)
