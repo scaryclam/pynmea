@@ -1,5 +1,15 @@
 import re
 from pynmea.utils import checksum_calc
+from pynmea.config import sentences
+
+
+class _NMEASentence(type):
+    """ Metaclass
+    """
+    def __new__(cls, clsname, clsbases, clsdict):
+        t = type.__new__(cls, clsname, clsbases, clsdict)
+        return t
+
 
 class NMEASentence(object):
     """ Base sentence class. This is used to pull apart a sentence.
