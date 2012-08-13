@@ -1,4 +1,5 @@
 import re
+
 from pynmea.utils import checksum_calc
 from pynmea.config import sentences
 
@@ -7,8 +8,16 @@ class _NMEASentence(type):
     """ Metaclass
     """
     def __new__(cls, clsname, clsbases, clsdict):
-        t = type.__new__(cls, clsname, clsbases, clsdict)
-        return t
+        new_t = type.__new__(cls, clsname, clsbases, clsdict)
+        return new_t
+
+
+class BaseNMEASentence(object):
+    __metaclass__ = _NMEASentence
+
+
+for sentence in sentences:
+    sentence['class']
 
 
 class NMEASentence(object):
@@ -30,10 +39,10 @@ class NMEASentence(object):
         self.parts = nmea_str.split(',')
 
         chksum_regex = re.compile(r".+((\*{1})(?i)(?P<chksum>[0-9a-f]{2}))$")
-        m = chksum_regex.match(nmea_str)
+        match = chksum_regex.match(nmea_str)
 
-        if m:
-            self.checksum = m.groupdict()['chksum']
+        if match:
+            self.checksum = match.groupdict()['chksum']
             d, par, ck = self.parts.pop().rpartition('*')
             self.parts.extend([d])
 
@@ -103,7 +112,7 @@ class GPALM(NMEASentence):
         parse_map = (("Total number of messages", "total_num_msgs"),
                      ("Message number", "msg_num"),
                      ("Satellite PRN number", "sat_prn_num"), # 01 - 32
-                     ("GPS week number", "gps_week_num"), # Week since Jan 6 1980
+                     ("GPS week number", "gps_week_num"),  # Week since Jan 6 1980
                      ("SV Health, bits 17-24 of each almanac page", "sv_health"),
                      ("Eccentricity", "eccentricity"),
                      ("Almanac Reference Time", "alamanac_ref_time"),
