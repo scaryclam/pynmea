@@ -8,7 +8,7 @@ Using the NMEA part of this library is simple:
 .. code-block:: python
 
     from pynmea import nmea
-    
+
     # This is a GPGGA sentence
     data = '$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F'
 
@@ -26,10 +26,10 @@ was created:
 
 .. code-block:: python
 
-    from pynmea.streamer import NMEAStreamer
+    from pynmea.streamer import NMEAStream
 
     with open('example_data_file.txt', 'r') as data_file:
-        streamer = NMEAStreamer(data_file)
+        streamer = NMEAStream(data_file)
         next_data = streamer.get_strings()
         data = []
         while next_data:
@@ -42,10 +42,10 @@ You may also chose to return a list of NMEA objects rather than plain text strin
 
 .. code-block:: python
 
-    from pynmea.streamer import NMEAStreamer
+    from pynmea.streamer import NMEAStream
 
     with open('example_data_file.txt', 'r') as data_file:
-        streamer = NMEAStreamer(data_file)
+        streamer = NMEAStream(data_file)
         next_data = streamer.get_objects()
         data = []
         while next_data:
@@ -57,9 +57,9 @@ You may also feed the streamer raw data from memory:
 
 .. code-block:: python
 
-    from pynmea.streamer import NMEAStreamer
+    from pynmea.streamer import NMEAStream
 
-    streamer = NMEAStreamer()
+    streamer = NMEAStream()
 
     raw_data = '$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F\n$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F\n$GPGGA,064746.000,4925.4895,N,00103.9255,E,1,05,2.1,-68.0,M,47.1,M,,0000*4F'
 
