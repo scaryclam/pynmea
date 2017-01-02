@@ -1,11 +1,12 @@
 import unittest
-from pynmea.nmea import (NMEASentence, GPAAM, GPALM, GPAPA, GPAPB, GPBEC, GPBOD,
-                         GPBWC, GPBWR, GPBWW, GPGGA, GPGLL, GPGSA, GPGSV, GPHDG,
-                         GPHDT, GPZDA, GPSTN, GPRMA, GPRMB, GPRMC, GPRTE, GPR00,
-                         GPTRF, GPVBW, GPVTG, GPWCV, GPWNC, GPWPL, GPXTE,
-                         PGRME, PGRMZ, PGRMM)
 
+from pynmea.nmea import (NMEASentence, GPAAM, GPALM, GPAPA, GPAPB, GPBEC, GPBOD,
+                         GPBWC, GPBWR, GPBWW, GPDBT, GPGGA, GPGLL, GPGSA, GPGSV,
+                         GPHDG, GPHDT, GPZDA, GPSTN, GPRMA, GPRMB, GPRMC, GPRTE,
+                         GPR00, GPTRF, GPVBW, GPVTG, GPWCV, GPWNC, GPWPL, GPXTE,
+                         PGRME, PGRMZ, PGRMM)
 from pynmea.utils import checksum_calc
+
 
 class TestNMEAParse(unittest.TestCase):
     def setUp(self):
@@ -341,6 +342,26 @@ class TestGPBWR(unittest.TestCase):
         self.assertEquals("N", p.range_unit)
         self.assertEquals("0001", p.waypoint_name)
         self.assertEquals("3E", p.checksum)
+
+
+class TestGPDBT(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_parses_map(self):
+        sentence_object = GPDBT()
+        sentence_object.parse("$GPDBT,1234.5,f,1234.5,M,123.4,F")
+
+        self.assertEquals("GPDBT", sentence_object.sen_type)
+        self.assertEquals("1234.5", sentence_object.feet)
+        self.assertEquals("f", sentence_object.feet_symbol)
+        self.assertEquals("1234.5", sentence_object.meters)
+        self.assertEquals("M", sentence_object.meters_symbol)
+        self.assertEquals("123.4", sentence_object.fathoms)
+        self.assertEquals("F", sentence_object.fathoms_symbol)
 
 
 class TestGPBWW(unittest.TestCase):
