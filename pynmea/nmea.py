@@ -281,6 +281,20 @@ class GPBWW(NMEASentence):
         super(GPBWW, self).__init__(parse_map)
 
 
+class GPDBT(NMEASentence):
+    """ Depth Below Transducer
+    """
+    def __init__(self):
+        parse_map = (
+            ('Feet', 'feet'),
+            ('Feet Symbol', 'feet_symbol'),
+            ('Meters', 'meters'),
+            ('Meters Symbol', 'meters_symbol'),
+            ('Fathoms', 'fathoms'),
+            ('Fathoms Symbol', 'fathoms_symbol'))
+        super(GPDBT, self).__init__(parse_map)
+
+
 class GPGLL(NMEASentence):
     def __init__(self):
         parse_map = (
@@ -695,13 +709,6 @@ class GPZDA(NMEASentence):
 
 # ---------------------------------- Not Yet Implimented --------------------- #
 # ---------------------------------------------------------------------------- #
-
-#class GPDBT(NMEASentence):
-#    """ Depth Below Transducer
-#    """
-#    def __init__(self):
-#        parse_map = ()
-#        super(GPDBT).__init__(parse_map)
 
 #class GPDPT(NMEASentence):
 #    """ Heading - Deviation and Variation
